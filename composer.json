@@ -1,0 +1,15 @@
+{
+    "name": "khushi/task-flow",
+    "autoload": {
+        "psr-4": {
+            "TaskFlow\\": "app/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Khushi Chachapara",
+            "email": "khushichachapara2003@gmail.com"
+        }
+    ],
+    "require": {}
+}
