@@ -9,7 +9,7 @@ class Database
 {
     private static $connection = null;
 
-    public static function connect()
+    public static function connect(): PDO
     {
         if (self::$connection === null) {
 
@@ -33,5 +33,8 @@ class Database
         }
 
         return self::$connection;
+    }
+    public static function getInstance():PDO{
+        return self::connect();
     }
 }

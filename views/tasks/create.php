@@ -26,7 +26,7 @@
         }
 
         label {
-            font-weight: bold;
+            font-size: medium;
         }
 
         input, textarea{
@@ -85,26 +85,26 @@
         </div>
     <?php endif; ?>
 
-    <form method="POST" action="/taskflow/tasks/create">
+    <form method="POST" action="<?= $basePath ?>/tasks/store">
 
-        <label>Title *</label>
-        <input type="text" name="title" required>
+        <label>Title <span style="color: #ce0d0d;">*</span></label>
+        <input type="text" placeholder="Add Task Title here ..." name="title"  value="<?= $_POST['title'] ?? '' ?>" required>
 
         <label>Description</label>
-        <textarea name="description"></textarea>
+        <textarea name="description" placeholder="Add Some Description"><?= $_POST['description'] ?? '' ?></textarea>
 
         <label>Status</label>
         <select name="status">
-            <option value="pending">Pending</option>
-            <option value="in_progress">In Progress</option>
-            <option value="completed">Completed</option>
+            <option value="pending" <?= (($_POST['status'] ?? '') == 'pending') ? 'selected' : '' ?>>Pending</option>
+            <option value="in_progress" <?=  (($_POST['status'] ?? '') == 'in_progress') ? 'selected' : '' ?>>In Progress</option>
+            <option value="completed" <?= (($_POST['status'] ?? '') == 'completed') ?'selected' : "" ?>>Completed</option>
         </select>
 
         <label>Priority</label>
         <select name="priority">
-            <option value="low">Low</option>
-            <option value="medium" selected>Medium</option>
-            <option value="high">High</option>
+            <option value="low" <?= (($_POST['priority'] ?? '') == "low") ? 'selected' : '' ?>>Low</option>
+            <option value="medium" <?= (($_POST['priority'] ?? '') == "medium") ? 'selected' : '' ?>>Medium</option>
+            <option value="high" <?= (($_POST['priority'] ?? '') == "high") ? 'selected' : '' ?>>High</option>
         </select>
 
         <button type="submit">Create Task</button>

@@ -59,7 +59,7 @@ switch ($uri) {
         (new TaskController())->index();
         break;
     case '/tasks/view':
-        (new TaskController())->view();
+        (new TaskController())->view($id);
         break;
 
 
@@ -72,8 +72,15 @@ switch ($uri) {
             (new TaskController())->store();
         }
         break;
-    case 'tasks/edit':
-        (new TaskController())->edit();
+
+    case '/tasks/edit':
+        (new TaskController())->edit($_GET['id']);
+        break;
+
+    case '/tasks/update':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            (new TaskController())->update($_POST['id']);
+        }
         break;
 
 
@@ -82,7 +89,7 @@ switch ($uri) {
         break;
 
     case '/tasks/delete':
-        (new TaskController())->softdelete();
+        (new TaskController())->softdelete($id);
         break;
 
     default:

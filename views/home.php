@@ -7,7 +7,7 @@
     <style>
         body {
             margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            font-family: Arial, sans-serif;
             background: #f4f6f8;
             color: #333;
         }
@@ -74,6 +74,6 @@
         </p>
     </div>
 </div>
-
+<?php require __DIR__ . '/partials/footer.php'; ?>
 </body>
 </html>

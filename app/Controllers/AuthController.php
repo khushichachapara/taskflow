@@ -1,11 +1,12 @@
 <?php
+
 namespace TaskFlow\Controllers;
 
-class AuthController {
+class AuthController
+{
 
-    public function login() {   
-
-        require __DIR__ . '/../../views/auth/login.php';
+    public function login()
+    {
 
         if (isset($_SESSION['user'])) {
             header('Location: /taskflow');
@@ -27,9 +28,9 @@ class AuthController {
                 exit;
             } else {
                 $error = 'Invalid username or password';
-            }
+            }   
         }
-
+        require __DIR__ . '/../../views/auth/login.php';
     }
 
     // public function logout() {

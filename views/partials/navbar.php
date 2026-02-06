@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <style>
     .navbar {
         background: whitesmoke;
@@ -41,7 +42,9 @@
     $currentpath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
     $hideNavOn = [
         '/taskflow/login',
-        '/taskflow/tasks/create'
+        '/taskflow/tasks/create',
+        '/taskflow/tasks/edit',
+        '/taskflow/tasks'
     ];
     if (!in_array($currentpath, $hideNavOn)):
     ?>
