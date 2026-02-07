@@ -74,13 +74,13 @@
 
     <form method="POST" action="<?= $basePath ?>/tasks/update">
 
-        <input type="hidden" name="id" value="<?= $task->id ?>">
+        <input type="hidden" name="id" value="<?= htmlspecialchars($task->id) ?>">
 
         <label>Title <span style="color: #ce0d0d;">*</span></label>
-        <input type="text" name="title" value="<?= $task->title ?>" required>
+        <input type="text" name="title" value="<?= htmlspecialchars($task->title) ?> " required>
 
         <label>Description</label>
-        <textarea name="description"><?= $task->description ?></textarea>
+        <textarea name="description"><?= htmlspecialchars($task->description) ?></textarea>
 
         <label>Status</label>
         <select name="status">

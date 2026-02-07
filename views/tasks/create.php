@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>Task | Create    </title>
 
     <style>
@@ -81,17 +82,17 @@
 
     <?php if (!empty($_SESSION['error'])): ?>
         <div class="error">
-            <?= $_SESSION['error']; unset($_SESSION['error']); ?>
+           <?= htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?>
         </div>
-    <?php endif; ?>
+    <?php endif; ?> 
 
     <form method="POST" action="<?= $basePath ?>/tasks/store">
 
         <label>Title <span style="color: #ce0d0d;">*</span></label>
-        <input type="text" placeholder="Add Task Title here ..." name="title"  value="<?= $_POST['title'] ?? '' ?>" required>
+        <input type="text" placeholder="Add Task Title here ..." name="title"  value="<?= htmlspecialchars($_POST['title'] ?? '') ?>" required>
 
         <label>Description</label>
-        <textarea name="description" placeholder="Add Some Description"><?= $_POST['description'] ?? '' ?></textarea>
+        <textarea name="description" placeholder="Add Some Description"><?= htmlspecialchars($_POST['description'] ?? '') ?></textarea>
 
         <label>Status</label>
         <select name="status">

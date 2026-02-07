@@ -44,7 +44,8 @@
         '/taskflow/login',
         '/taskflow/tasks/create',
         '/taskflow/tasks/edit',
-        '/taskflow/tasks'
+        '/taskflow/tasks',
+        '/taskflow/tasks/view'
     ];
     if (!in_array($currentpath, $hideNavOn)):
     ?>

@@ -59,7 +59,7 @@ switch ($uri) {
         (new TaskController())->index();
         break;
     case '/tasks/view':
-        (new TaskController())->view($id);
+        (new TaskController())->view($_GET['id']);
         break;
 
 
@@ -71,6 +71,10 @@ switch ($uri) {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             (new TaskController())->store();
         }
+        else {
+        header("Location: /taskflow/tasks");
+        exit;
+    }
         break;
 
     case '/tasks/edit':
@@ -81,6 +85,10 @@ switch ($uri) {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             (new TaskController())->update($_POST['id']);
         }
+        else {
+        header("Location: /taskflow/tasks");
+        exit;
+    }
         break;
 
 
@@ -89,7 +97,7 @@ switch ($uri) {
         break;
 
     case '/tasks/delete':
-        (new TaskController())->softdelete($id);
+        (new TaskController())->softdelete($_GET['id']);
         break;
 
     default:

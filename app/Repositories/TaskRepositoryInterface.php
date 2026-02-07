@@ -15,5 +15,4 @@ interface TaskRepositoryInterface
 
     public function softDelete(int $id): bool;
 
-    public function restore (int $id) : bool;
 }

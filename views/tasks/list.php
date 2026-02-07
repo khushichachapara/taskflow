@@ -23,6 +23,8 @@
         h2 {
             margin-bottom: 15px;
             color: #1f2937;
+            display: flex;
+            justify-content: center;
         }
 
         .filters {
@@ -46,8 +48,9 @@
             border-radius: 4px;
             cursor: pointer;
         }
-        .filters button:hover{
-            background :white;
+
+        .filters button:hover {
+            background: white;
             color: #459efe;
 
         }
@@ -68,14 +71,33 @@
             background: #eef2ff;
         }
 
-        .actions a {
-            margin-right: 6px;
-            text-decoration: none;
-            color: #459efe;
-            font-weight: bold;
+        .actions form {
+            display: inline;
         }
 
-        .actions a.delete {
+        .actions button {
+            background: #459efe;
+            color: #fff;
+            border: 1px solid #459efe;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+
+        .actions button:hover {
+            background: #fff;
+            color: #459efe;
+        }
+
+        .actions button.delete {
+            background: #d11a2a;
+            border-color: #d11a2a;
+            margin-top: 5%;
+        }
+
+        .actions button.delete:hover {
+            background: #fff;
             color: #d11a2a;
         }
     </style>
@@ -88,7 +110,6 @@
     <div class="container">
         <h2>Task List</h2>
 
-        <!-- Filters -->
         <div class="filters">
             <select>
                 <option>Status</option>
@@ -107,8 +128,6 @@
 
             <button>Apply</button>
         </div>
-
-        <!-- Table -->
         <table>
             <thead>
                 <tr>
@@ -123,18 +142,32 @@
 
             <tbody>
 
-                <<?php foreach ($tasks as $task): ?>
+                <?php foreach ($tasks as $task): ?>
                     <tr>
-                    <td><?= $task->title ?></td>
-                    <td><?= $task->status ?></td>
-                    <td><?= $task->priority ?></td>
-                    <td><?= $task->created_at ?></td>
-                    <td><?= $task->comment_count ?></td>
-                    <td class="actions">
-                        <a href="<?= $basePath ?>/tasks/view?id=<?= $task->id ?>">View</a>
-                        <a href="<?= $basePath ?>/tasks/edit?id=<?= $task->id ?>">Edit</a>
-                        <a href="<?= $basePath ?>/tasks/delete?id=<?= $task->id ?>" class="delete">Delete</a>
-                    </td>
+                        <td><?= htmlspecialchars($task->title) ?></td>
+                        <td><?= htmlspecialchars($task->status) ?></td>
+                        <td><?= htmlspecialchars($task->priority) ?></td>
+                        <td><?= htmlspecialchars($task->created_at) ?></td>
+                        <td><?= htmlspecialchars($task->comment_count) ?></td>
+
+                        <td class="actions">
+                            <form action="<?= $basePath ?>/tasks/view" method="get" style="display:inline;">
+                                <input type="hidden" name="id" value="<?= htmlspecialchars($task->id) ?>">
+                                <button type="submit">View</button>
+                            </form>
+
+                            <form action="<?= $basePath ?>/tasks/edit" method="get" style="display:inline;">
+                                <input type="hidden" name="id" value="<?= htmlspecialchars($task->id) ?>">
+                                <button type="submit">Edit</button>
+                            </form>
+
+                            <form action="<?= $basePath ?>/tasks/delete" method="get" style="display:inline;"
+                                onsubmit="return confirm('Delete this task?');">
+                                <input type="hidden" name="id" value="<?= htmlspecialchars($task->id) ?>">
+                                <button type="submit" class="delete">Delete</button>
+                            </form>
+                            </td>
+
                     </tr>
                 <?php endforeach; ?>
 

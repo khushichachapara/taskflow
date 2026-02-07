@@ -16,6 +16,11 @@ class TaskRepository implements TaskRepositoryInterface
         $this->db = Database::getInstance();
     }
 
+
+
+
+
+    //this for fetch all column simple and second one with aggregate column count with json return api endpoint 
     public function getAll(): array
     {
         $stmt = $this->db->query("
@@ -31,6 +36,36 @@ class TaskRepository implements TaskRepositoryInterface
         return $tasks;
     }
 
+    public function getTasksWithCommentCount(): array
+    {
+        $stmt = $this->db->query("
+                SELECT 
+                    t.id,
+                    t.title,
+                    t.status,
+                    t.priority,
+                    t.created_at,
+                    COUNT(c.id) AS comment_count
+                FROM tasks t
+                LEFT JOIN comments c ON c.task_id = t.id
+                WHERE t.is_deleted = 0
+                GROUP BY t.id
+                ORDER BY t.id DESC
+            ");
+
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $tasks = [];
+        foreach ($rows as $row) {
+            $tasks[] = new Task($row);
+        }
+
+        return $tasks;
+    }
+
+
+
+    //this is for view specific task page 
     public function findById(int $id): ?Task
     {
         $stmt = $this->db->prepare("
@@ -43,6 +78,8 @@ class TaskRepository implements TaskRepositoryInterface
         return $row ? new Task($row) : null;
     }
 
+
+    //crete task insert quary
     public function create(array $data): bool
     {
         $stmt = $this->db->prepare("
@@ -58,6 +95,8 @@ class TaskRepository implements TaskRepositoryInterface
         ]);
     }
 
+
+    //update or edit quary for task 
     public function update(int $id, array $data): bool
     {
         $stmt = $this->db->prepare("
@@ -75,6 +114,8 @@ class TaskRepository implements TaskRepositoryInterface
         ]);
     }
 
+
+    //soft delete task  
     public function softDelete(int $id): bool
     {
         $stmt = $this->db->prepare("
@@ -85,35 +126,17 @@ class TaskRepository implements TaskRepositoryInterface
 
         return $stmt->execute([$id]);
     }
-    public function restore(int $id): bool
-    {
-        $stmt = $this->db->prepare("
-        UPDATE tasks
-        SET is_deleted = 0
-        WHERE id = ?
-    ");
-
-        return $stmt->execute([$id]);
-    }
 
 
-    public function getTasksWithCommentCount(): array
-    {
-        $stmt = $this->db->query("
-        SELECT 
-            t.id,
-            t.title,
-            t.status,
-            t.priority,
-            t.created_at,
-            COUNT(c.id) AS comment_count
-        FROM tasks t
-        LEFT JOIN comments c ON c.task_id = t.id
-        WHERE t.is_deleted = 0
-        GROUP BY t.id
-        ORDER BY t.id DESC
-    ");
+    //optional if we want to restore task
+    // public function restore(int $id): bool
+    // {
+    //     $stmt = $this->db->prepare("
+    //     UPDATE tasks
+    //     SET is_deleted = 0
+    //     WHERE id = ?
+    // ");
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+    //     return $stmt->execute([$id]);
+    // }
 }
