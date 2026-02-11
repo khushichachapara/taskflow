@@ -9,6 +9,7 @@ require __DIR__ . '/../vendor/autoload.php';
 use TaskFlow\Controllers\HomeController;
 use TaskFlow\Controllers\AuthController;
 use TaskFlow\Controllers\TaskController;
+use TaskFlow\Controllers\CommentController;
 use Dotenv\Dotenv;
 
 $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
@@ -32,6 +33,7 @@ $protectedRoutes = [
     '/tasks/view',
     '/tasks/store',
     '/tasks/delete',
+    '/comments/store',
     '/api/tasks'
 ];
 
@@ -99,6 +101,16 @@ switch ($uri) {
     case '/tasks/delete':
         (new TaskController())->softdelete($_GET['id']);
         break;
+
+    case '/comments/store':
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        (new CommentController())->store();
+    } else {
+        header("Location: /taskflow/tasks");
+        exit;
+    }
+    break;
+
 
     default:
         echo "404 - Page Not Found";

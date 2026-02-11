@@ -61,8 +61,8 @@ class TaskRepository implements TaskRepositoryInterface
     }
 
     public function getFilteredTasks(array $filters): array
-{
-    $sql = "
+    {
+        $sql = "
         SELECT 
             t.id,
             t.title,
@@ -75,39 +75,39 @@ class TaskRepository implements TaskRepositoryInterface
         WHERE t.is_deleted = 0
     ";
 
-    $params = [];
+        $params = [];
 
-    if (!empty($filters['status'])) {
-        $sql .= " AND t.status = ?";
-        $params[] = $filters['status'];
+        if (!empty($filters['status'])) {
+            $sql .= " AND t.status = ?";
+            $params[] = $filters['status'];
+        }
+
+        if (!empty($filters['search'])) {
+            $sql .= " AND t.title LIKE ?";
+            $params[] = "%" . $filters['search'] . "%";
+        }
+
+        $sql .= " GROUP BY t.id";
+
+        if (!empty($filters['sort'])) {
+            $sql .= " ORDER BY t." . $filters['sort'] . " DESC";
+        } else {
+            $sql .= " ORDER BY t.id DESC";
+        }
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $tasks = [];
+        foreach ($rows as $row) {
+            $tasks[] = new Task($row);
+        }
+
+        return $tasks;
     }
 
-    if (!empty($filters['search'])) {
-        $sql .= " AND t.title LIKE ?";
-        $params[] = "%" . $filters['search'] . "%";
-    }
-
-    $sql .= " GROUP BY t.id";
-
-    if (!empty($filters['sort'])) {
-        $sql .= " ORDER BY t." . $filters['sort'] . " DESC";
-    } else {
-        $sql .= " ORDER BY t.id DESC";
-    }
-
-    $stmt = $this->db->prepare($sql);
-    $stmt->execute($params);
-
-    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    $tasks = [];
-    foreach ($rows as $row) {
-        $tasks[] = new Task($row);
-    }
-
-    return $tasks;
-}
-    
 
 
     //this is for view specific task page 
@@ -125,19 +125,20 @@ class TaskRepository implements TaskRepositoryInterface
 
 
     //crete task insert quary
-    public function create(array $data): bool
+    public function create(array $data): int
     {
         $stmt = $this->db->prepare("
             INSERT INTO tasks (title, description, status, priority)
             VALUES (?, ?, ?, ?)
         ");
 
-        return $stmt->execute([
+        $stmt->execute([
             $data['title'],
             $data['description'],
             $data['status'],
             $data['priority']
         ]);
+        return (int)$this->db->lastInsertId();
     }
 
 

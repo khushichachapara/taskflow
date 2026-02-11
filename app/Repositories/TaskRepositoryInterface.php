@@ -9,7 +9,7 @@ interface TaskRepositoryInterface
 
     public function findById(int $id): ?Task;
 
-    public function create(array $data): bool;
+    public function create(array $data): int;
 
     public function update(int $id, array $data): bool;
 
