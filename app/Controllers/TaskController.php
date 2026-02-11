@@ -15,8 +15,18 @@ class TaskController
     //this is for list task page
     public function index()
     {
-        $basePath ='/taskflow';
-        $tasks = $this->taskRepository->getTasksWithCommentCount();
+        $basePath = '/taskflow';
+        $filters = [
+            'status' => $_GET['status'] ?? null,
+            'search' => $_GET['search'] ?? null,
+            'sort'   => $_GET['sort'] ?? null
+        ];
+
+        if (!empty($_GET)) {
+            $tasks = $this->taskRepository->getFilteredTasks($filters);
+        } else {
+            $tasks = $this->taskRepository->getTasksWithCommentCount();
+        }
         // echo json_encode($tasks);
         require __DIR__ . '/../../views/tasks/list.php';
     }
@@ -49,13 +59,13 @@ class TaskController
 
         ];
 
-        $title =trim($data['title']);
+        $title = trim($data['title']);
         if (empty($title)) {
             $_SESSION['error'] = 'Title is Required.';
             header("Location: /taskflow/tasks/create");
             exit;
         }
-        if(!preg_match("/^[a-zA-Z0-9_-]+$/",$title)){
+        if (!preg_match("/^[a-zA-Z0-9_-]+$/", $title)) {
             $_SESSION['error'] = 'Invalid input type.';
             header("Location: /taskflow/tasks/create");
             exit;
@@ -72,7 +82,7 @@ class TaskController
     //this is for edit tasks form page 
     public function edit($id)
     {
-        $basePath ='/taskflow';
+        $basePath = '/taskflow';
         $task = $this->taskRepository->findById($id);
         if (!$task) {
             echo 'task not found';

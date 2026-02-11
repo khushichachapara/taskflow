@@ -24,7 +24,7 @@
             margin-bottom: 20px;
             color: #1f2937;
         }
-        
+
         button {
             width: 100%;
             padding: 10px;
@@ -49,7 +49,7 @@
 
 <div class="container">
   
-
+    
     
 </div>
 <?php require __DIR__.'/../partials/footer.php';?>

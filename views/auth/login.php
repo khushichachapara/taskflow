@@ -57,10 +57,11 @@
         }
 
         .error {
-            color: #dc2626;
-            font-size: 14px;
-            margin-bottom: 12px;
-            text-align: center;
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 8px;
+            border-radius: 4px;
+            margin-bottom: 15px;
         }
     </style>
 </head>

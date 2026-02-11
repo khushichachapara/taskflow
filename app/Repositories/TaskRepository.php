@@ -17,9 +17,6 @@ class TaskRepository implements TaskRepositoryInterface
     }
 
 
-
-
-
     //this for fetch all column simple and second one with aggregate column count with json return api endpoint 
     public function getAll(): array
     {
@@ -63,6 +60,54 @@ class TaskRepository implements TaskRepositoryInterface
         return $tasks;
     }
 
+    public function getFilteredTasks(array $filters): array
+{
+    $sql = "
+        SELECT 
+            t.id,
+            t.title,
+            t.status,
+            t.priority,
+            t.created_at,
+            COUNT(c.id) AS comment_count
+        FROM tasks t
+        LEFT JOIN comments c ON c.task_id = t.id
+        WHERE t.is_deleted = 0
+    ";
+
+    $params = [];
+
+    if (!empty($filters['status'])) {
+        $sql .= " AND t.status = ?";
+        $params[] = $filters['status'];
+    }
+
+    if (!empty($filters['search'])) {
+        $sql .= " AND t.title LIKE ?";
+        $params[] = "%" . $filters['search'] . "%";
+    }
+
+    $sql .= " GROUP BY t.id";
+
+    if (!empty($filters['sort'])) {
+        $sql .= " ORDER BY t." . $filters['sort'] . " DESC";
+    } else {
+        $sql .= " ORDER BY t.id DESC";
+    }
+
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute($params);
+
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $tasks = [];
+    foreach ($rows as $row) {
+        $tasks[] = new Task($row);
+    }
+
+    return $tasks;
+}
+    
 
 
     //this is for view specific task page 
