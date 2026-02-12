@@ -17,13 +17,13 @@ class CommentRepository
     }
 
 
-    //get comment
+    //-------------------view or get comments
     public function getCommentByTaskId($taskId)
     {
         $stmt = $this->db->prepare("
         SELECT * FROM comments
         WHERE task_id = ?
-        ORDER BY created_at DESC
+        ORDER BY created_at 
     ");
         $stmt->execute([$taskId]);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -37,7 +37,7 @@ class CommentRepository
 
 
 
-    //create new comments 
+    //----------------------create new comments 
     public function create(array $data): bool
     {
         $stmt = $this->db->prepare("

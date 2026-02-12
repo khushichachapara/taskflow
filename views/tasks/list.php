@@ -17,7 +17,7 @@
             background: #fff;
             padding: 20px;
             border-radius: 6px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.2);
         }
 
         .header-row {
@@ -172,7 +172,7 @@
                     <th>Status</th>
                     <th>Priority</th>
                     <th>Created</th>
-                    <!-- <th>Comments</th> -->
+                    <th>Comments</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -185,7 +185,7 @@
                         <td><?= htmlspecialchars($task->status) ?></td>
                         <td><?= htmlspecialchars($task->priority) ?></td>
                         <td><?= htmlspecialchars($task->created_at) ?></td>
-                        <!-- <td><?= htmlspecialchars($task->comment_count) ?></td> -->
+                        <td><?= htmlspecialchars($task->comment_count ?? 0) ?></td>
 
                         <td class="actions">
                             <form action="<?= $basePath ?>/tasks/view" method="get" style="display:inline;">

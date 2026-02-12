@@ -17,13 +17,25 @@ class TaskRepository implements TaskRepositoryInterface
     }
 
 
-    //this for fetch all column simple and second one with aggregate column count with json return api endpoint 
+    //-----------------this for fetch all column simple and second one with aggregate column count with json return api endpoint 
     public function getAll(): array
     {
         $stmt = $this->db->query("
-            SELECT * FROM tasks
-            WHERE is_deleted = 0
-            ORDER BY id DESC
+            SELECT 
+                    t.id,
+                    t.title,
+                    t.description,
+                    t.status,
+                    t.priority,
+                    t.created_at,
+                    is_deleted,
+                    t.updated_at,
+                    COUNT(c.id) AS comment_count
+                FROM tasks t
+                WHERE t.is_deleted = 0
+                LEFT JOIN comments c ON c.task_id = t.id
+                GROUP BY t.id
+                ORDER BY t.id DESC
         ");
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $tasks = [];
@@ -110,12 +122,15 @@ class TaskRepository implements TaskRepositoryInterface
 
 
 
-    //this is for view specific task page 
+
+
+
+    //---------------this is for view specific task page 
     public function findById(int $id): ?Task
     {
         $stmt = $this->db->prepare("
             SELECT * FROM tasks
-            WHERE id = ? AND is_deleted = 0
+            WHERE id = ? 
         ");
 
         $stmt->execute([$id]);
@@ -124,7 +139,11 @@ class TaskRepository implements TaskRepositoryInterface
     }
 
 
-    //crete task insert quary
+
+
+
+
+    //-----------------crete task insert quary
     public function create(array $data): int
     {
         $stmt = $this->db->prepare("
@@ -142,7 +161,10 @@ class TaskRepository implements TaskRepositoryInterface
     }
 
 
-    //update or edit quary for task 
+
+
+
+    //-------------------update or edit quary for task 
     public function update(int $id, array $data): bool
     {
         $stmt = $this->db->prepare("
@@ -161,7 +183,9 @@ class TaskRepository implements TaskRepositoryInterface
     }
 
 
-    //soft delete task  
+
+
+    //-------------------soft delete task  
     public function softDelete(int $id): bool
     {
         $stmt = $this->db->prepare("

@@ -15,7 +15,9 @@ class ActivityRepository
         $this->db = Database::getInstance();
     }
 
-    //get activity log
+
+
+    //----------------create activity log
     public function create(array $data)
     {
         $stmt = $this->db->prepare("
@@ -31,7 +33,9 @@ class ActivityRepository
     }
 
 
-    //get log
+
+
+    //--------------------get log
     public function getLogByTaskId($taskId)
     {
         $stmt = $this->db->prepare("

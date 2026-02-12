@@ -19,6 +19,9 @@ $dotenv->load();
 // die;
 
 
+
+
+
 $basePath = '/taskflow';
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -42,24 +45,33 @@ if (in_array($uri, $protectedRoutes) && !isset($_SESSION['user'])) {
     exit;
 }
 
+
+
+
+
 switch ($uri) {
 
     case '/':
         (new HomeController())->index();
         break;
 
+
     case '/login':
         (new AuthController())->login();
         break;
+
 
     case '/logout':
         session_destroy();
         header('Location: ' . $basePath . '/');
         break;
 
+
     case '/tasks':
         (new TaskController())->index();
         break;
+
+
     case '/tasks/view':
         (new TaskController())->view($_GET['id']);
         break;
@@ -68,6 +80,7 @@ switch ($uri) {
     case '/tasks/create':
         (new TaskController())->create();
         break;
+
 
     case '/tasks/store':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -79,9 +92,12 @@ switch ($uri) {
     }
         break;
 
+
+
     case '/tasks/edit':
         (new TaskController())->edit($_GET['id']);
         break;
+
 
     case '/tasks/update':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -94,13 +110,19 @@ switch ($uri) {
         break;
 
 
+
+
     case '/api/tasks':
         (new TaskController())->apiList();
         break;
 
+
+
     case '/tasks/delete':
         (new TaskController())->softdelete($_GET['id']);
         break;
+
+
 
     case '/comments/store':
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -110,6 +132,7 @@ switch ($uri) {
         exit;
     }
     break;
+
 
 
     default:

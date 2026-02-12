@@ -14,6 +14,7 @@ TaskFlow is a simple PHP MVC-based task management application that allows users
 ---
 
 ## Installation
+
 ```bash
 git clone <repo-url>
 cd TaskFlow
@@ -28,4 +29,40 @@ DB_PASS
 
 CREATE DATABASE taskflow
 
-run php application 
+run php application -- open in browser -- http://kvc.testproj.127.aum/taskflow
+
+----------------------------------------------------------------------
+Main Routes
+Authentication
+
+/login
+/logout
+
+Tasks
+
+GET /tasks – List tasks
+GET /tasks/create – Create form
+POST /tasks/store – Store task
+GET /tasks/edit?id={id} – Edit form
+POST /tasks/update – Update task
+GET /tasks/delete?id={id} – Soft delete
+GET /tasks/view?id={id} – Task detail
+
+Comments
+
+POST /comments/store – Add comment
+
+API
+
+GET /api/tasks – Returns tasks JSON
+
+--------------------------------------------------------------------------
+Assumptions
+
+Soft-deleted tasks are excluded from task list.
+Activity logs are automatically generated on: Task created , Task updated , Task deleted
+
+Comment counts are generated using LEFT JOIN + COUNT + GROUP BY.
+
+Only authenticated users can access protected routes.
+

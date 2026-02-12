@@ -12,6 +12,7 @@ class Task
     public int $is_deleted = 0;
     public ?string $created_at = null;
     public ?string $updated_at = null;
+    public int $comment_count = 0;
 
     public function __construct(array $data = [])
     {
@@ -23,6 +24,7 @@ class Task
         $this->is_deleted = $data['is_deleted'] ?? 0;
         $this->created_at = $data['created_at'] ?? null;
         $this->updated_at = $data['updated_at'] ?? null;
+        $this->comment_count = $data['comment_count'] ?? 0;
     }
 }
     
