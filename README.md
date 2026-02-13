@@ -25,7 +25,7 @@ create environment file
 DB_HOST=127.0.0.1
 DB_NAME=taskflow
 DB_USER=root
-DB_PASS
+DB_PASS=
 
 CREATE DATABASE taskflow
 
@@ -66,3 +66,16 @@ Comment counts are generated using LEFT JOIN + COUNT + GROUP BY.
 
 Only authenticated users can access protected routes.
 
+---------------------------------------------------------------------------
+
+MVC + Repository + Model Flow
+
+The user sends a request (for example: /tasks)
+The Router forwards the request to the Controller
+The Controller calls the Repository
+(“Fetch the tasks data”)
+The Repository retrieves raw data from the database
+The Repository converts the raw database data into Model objects
+The Model objects are returned to the Controller
+The Controller passes the Model data to the View
+The View displays the data to the user

@@ -28,13 +28,16 @@ class Database
                     ]
                 );
             } catch (PDOException $e) {
-                die("Database connection failed: " . $e->getMessage());
+                error_log("DB Connection Error: " . $e->getMessage());
+
+                die("Database connection failed. Please try again later.");
             }
         }
 
         return self::$connection;
     }
-    public static function getInstance():PDO{
+    public static function getInstance(): PDO
+    {
         return self::connect();
     }
 }
