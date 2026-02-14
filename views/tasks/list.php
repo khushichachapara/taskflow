@@ -17,7 +17,7 @@
             background: #fff;
             padding: 20px;
             border-radius: 6px;
-            box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
         }
 
         .header-row {
@@ -35,7 +35,7 @@
             border-radius: 4px;
             text-decoration: none;
         }
-        
+
         .create-btn:hover {
             background: #fff;
             color: #459efe;
@@ -129,6 +129,27 @@
 
 
         }
+
+        .btnall {
+            background: #6b7280;
+            color: #fff;
+            border: 1px solid #6b7280;
+            padding: 8px 14px;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .btnall:hover {
+            background: #fff;
+            color: #6b7280;
+        }
+
+        .filters a.btnall {
+            margin-left: 5px;
+        }
     </style>
 </head>
 
@@ -162,6 +183,13 @@
 
                 <button type="submit">Apply</button>
 
+
+                <!-- impliment all task view button after filtering -->
+
+
+                <a href="<?= $basePath ?>/tasks"
+                    class="btnall">Clear Filter
+                </a>
             </div>
         </form>
 
