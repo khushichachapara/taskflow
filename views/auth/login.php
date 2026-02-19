@@ -13,13 +13,13 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: 10% auto;
+            margin: 5% auto;
         }
 
         .card {
             background: #fff;
             padding: 35px;
-            width: 320px;
+            width: 350px;
             border-radius: 10px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
@@ -63,6 +63,15 @@
             border-radius: 4px;
             margin-bottom: 15px;
         }
+        p {
+            text-align: center;
+            margin-top: 15px;
+        }
+        p a{
+            text-decoration: none;
+            color:#459efe ;
+            font-weight:bold; 
+        }
     </style>
 </head>
 <body>
@@ -77,11 +86,14 @@
             <div class="error"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
 
-        <form method="POST">
-            <input type="text" name="username" placeholder="Username" required>
+        <form method="POST" >
+            <input type="email" name="email" placeholder="Email Address" required>
             <input type="password" name="password" placeholder="Password" required>
             <button type="submit">Login</button>
         </form>
+        <p> Don't have account?
+                <a href="/taskflow/register">Sign Up</a>
+            </p>
     </div>
 </div>
 <?php require __DIR__ . '/../partials/footer.php'; ?>

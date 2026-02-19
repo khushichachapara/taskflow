@@ -27,6 +27,12 @@ class TaskController
         ]);
     }
 
+    //--------------------helper for get user id 
+    private function getUserId()
+    {
+        return $_SESSION['user_id'] ?? null;
+    }
+
 
 
 
@@ -34,6 +40,7 @@ class TaskController
     public function index()
     {
         $basePath = '/taskflow';
+        $user_id = $this->getUserId();
         $filters = [
             'status' => $_GET['status'] ?? null,
             'search' => $_GET['search'] ?? null,
@@ -41,22 +48,23 @@ class TaskController
         ];
 
         if (!empty($filters['status']) || !empty($filters['search']) || !empty($filters['sort'])) {
-            $tasks = $this->taskRepository->getFilteredTasks($filters);
+            $tasks = $this->taskRepository->getFilteredTasks($filters, $user_id);
         } else {
-            $tasks = $this->taskRepository->getTasksWithCommentCount();
+            $tasks = $this->taskRepository->getTasksWithCommentCount($user_id);
         }
 
         //echo json_encode($tasks);
         require __DIR__ . '/../../views/tasks/list.php';
     }
 
+    
     //----------------json api endpoint task list page
     public function apiList()
     {
         header('Content-Type: application/json');
 
         //====this getAll() method is only for api endpoint json data showing====
-        $tasks = $this->taskRepository->getAll();
+        $tasks = $this->taskRepository->getAll($this->getUserId());
 
         echo json_encode($tasks);
         exit;
@@ -78,6 +86,7 @@ class TaskController
     {
 
         $data = [
+            'user_id' => $this->getUserId(),
             'title' => $_POST['title'] ?? '',
             'description' => $_POST['description'] ?? '',
             'status' => $_POST['status'] ?? 'pending',
@@ -113,7 +122,7 @@ class TaskController
     public function edit($id)
     {
         $basePath = '/taskflow';
-        $task = $this->taskRepository->findById($id);
+        $task = $this->taskRepository->findById($id, $this->getUserId());
         if (!$task) {
             echo 'task not found';
             return;
@@ -124,7 +133,9 @@ class TaskController
 
     public function update($id)
     {
-        $oldTask = $this->taskRepository->findById($id);
+        $user_id = $this->getUserId();
+
+        $oldTask = $this->taskRepository->findById($id, $user_id);
         $data = [
             'title' => $_POST['title'],
             'description' => $_POST['description'],
@@ -155,7 +166,15 @@ class TaskController
     //-------------------just soft delete task
     public function softdelete($id)
     {
-        $this->taskRepository->softDelete($id);
+
+
+        $task = $this->taskRepository->findById($id, $this->getUserId());
+        if (!$task) {
+            echo 'Task not found';
+            return;
+        }
+        $user_id = $this->getUserId();
+        $this->taskRepository->softDelete($id, $user_id);
         $this->logActivity($id, 'task_deleted', 'Task Deleted');
 
         if (isset($_GET['from']) && $_GET['from'] === 'view') {
@@ -173,8 +192,16 @@ class TaskController
     //--------------this is for view specific task page 
     public function view($id)
     {
+
+        $user_id = $this->getUserId();
+
+        $task = $this->taskRepository->findById($id, $user_id);
+        if (!$task) {
+            echo 'Task not found';
+            return;
+        }
         $basePath = '/taskflow';
-        $task = $this->taskRepository->findById($id);
+        $task = $this->taskRepository->findById($id, $user_id);
         if (!$task) {
             echo 'task not found';
             return;

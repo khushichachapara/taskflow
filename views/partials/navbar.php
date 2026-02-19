@@ -3,7 +3,7 @@
     .navbar {
         background: whitesmoke;
         padding: 30px;
-         display: flex;
+        display: flex;
         justify-content: space-between;
         align-items: center;
         color: #459efe;
@@ -34,29 +34,104 @@
         background: #e0e7ff;
         color: #459efe;
     }
+
+
+    .user-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-right: 20px;
+    }
+
+    .user-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #459efe;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+
+    .user-name {
+        color: #fe5145;
+    }
 </style>
 
+
+
+
+<?php
+
+//button visibility logic
+$currentpath =rtrim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
+
+
+$isLoginPage = ($currentpath === '/taskflow/login');
+$isRegisterPage = ($currentpath === '/taskflow/register');
+$isHome = ($currentpath === '/taskflow' || $currentpath === '');
+
+$hideNavOn = [
+    '/taskflow/login',
+    '/taskflow/tasks/create',
+    '/taskflow/tasks/edit',
+    '/taskflow/tasks',
+    '/taskflow/tasks/view'
+];
+
+//user info for navbar display
+$userName = htmlspecialchars($_SESSION['user_name'] ?? '');
+$initial = strtoupper(substr($userName, 0, 1));
+
+?>
+
+
+
+<!-- ui -->
 <nav class="navbar">
     <div class="brand"><a href="/taskflow">TaskFlow</a></div>
-    <?php
-    $currentpath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-    $hideNavOn = [
-        '/taskflow/login',
-        '/taskflow/tasks/create',
-        '/taskflow/tasks/edit',
-        '/taskflow/tasks',
-        '/taskflow/tasks/view'
-    ];
-    if (!in_array($currentpath, $hideNavOn)):
-    ?>
-        <div class="links">
-            <?php if (isset($_SESSION['user'])): ?>
+    <div class="links">
+        <?php if (isset($_SESSION['user_id'])): ?>
+            <?php if (in_array($currentpath, $hideNavOn)): ?>
+
+                <!-- Circle shown -->
+                <div class="user-box">
+                    <div class="user-circle"><?= $initial ?></div>
+                    <div class="user-name"><?= $userName ?></div>
+                </div>
+            <?php else: ?>
+                <span style="color: black;">
+
+                    <?php if ($isHome): ?>
+                        Welcome, <?= $userName ?>
+                    <?php else: ?>
+                        <?= $userName ?>
+                    <?php endif; ?>
+                </span>
+
+
                 <a href="tasks">Tasks</a>
                 <a href="tasks/create">Create Task</a>
                 <a href="logout">Logout</a>
+            <?php endif; ?>
+        <?php else: ?>
+
+            <?php if ($isLoginPage): ?>
+                <a href="register">Sign Up</a>
+
+            <?php elseif ($isRegisterPage): ?>
+                <a href="login">Login</a>
+
             <?php else: ?>
                 <a href="login">Login</a>
+                <a href="register">Sign Up</a>
             <?php endif; ?>
-        </div>
-    <?php endif; ?>
+
+        <?php endif; ?>
+
+
+    </div>
+
 </nav>

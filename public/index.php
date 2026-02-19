@@ -1,8 +1,8 @@
 <?php
-//ini_set('display_errors', 1);
+ini_set('display_errors', 1);
 // ini_set('display_startup_errors', 1);
-//error_reporting(E_ALL);
-ini_set('log error' ,1);
+error_reporting(E_ALL);
+ini_set('log_errors' ,1);
 ini_set('error_log', __DIR__ . '/../storage/logs/app.log');
 session_start();
 require __DIR__ . '/../vendor/autoload.php';
@@ -19,7 +19,7 @@ $dotenv->load();
 // $db = TaskFlow\Core\Database::connect();
 // echo "DB connected successfully";
 // die;
-
+$pdo = \TaskFlow\Core\Database::connect();
 
 
 
@@ -42,7 +42,7 @@ $protectedRoutes = [
     '/api/tasks'
 ];
 
-if (in_array($uri, $protectedRoutes) && !isset($_SESSION['user'])) {
+if (in_array($uri, $protectedRoutes) && !isset($_SESSION['user_id'])) {
     header('Location: ' . $basePath . '/login');
     exit;
 }
@@ -59,13 +59,24 @@ switch ($uri) {
 
 
     case '/login':
-        (new AuthController())->login();
-        break;
+      if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        (new AuthController($pdo))->login();
+    } else {
+        (new AuthController($pdo))->loginForm();
+    }
+    break;
 
+
+    case '/register':
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        (new AuthController($pdo))->register();
+    } else {
+        (new AuthController($pdo))->registerForm();
+    }
+    break;
 
     case '/logout':
-        session_destroy();
-        header('Location: ' . $basePath . '/');
+        (new AuthController($pdo))->logout();
         break;
 
 
@@ -75,6 +86,10 @@ switch ($uri) {
 
 
     case '/tasks/view':
+        if (!isset($_GET['id'])) {
+        header("Location: /taskflow/tasks");
+        exit;
+    }
         (new TaskController())->view($_GET['id']);
         break;
 

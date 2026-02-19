@@ -1,5 +1,8 @@
 <?php
 
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);
 namespace TaskFlow\Repositories;
 
 use TaskFlow\Core\Database;
@@ -18,9 +21,9 @@ class TaskRepository implements TaskRepositoryInterface
 
 
     //-----------------this for fetch all column simple and second one with aggregate column count with json return api endpoint 
-    public function getAll(): array
+    public function getAll(int $user_id): array
     {
-        $stmt = $this->db->query("
+        $stmt = $this->db->prepare("
             SELECT 
                     t.id,
                     t.title,
@@ -32,11 +35,14 @@ class TaskRepository implements TaskRepositoryInterface
                     t.updated_at,
                     COUNT(c.id) AS comment_count
                 FROM tasks t
-                WHERE t.is_deleted = 0
                 LEFT JOIN comments c ON c.task_id = t.id
+                WHERE t.is_deleted = 0
+                AND t.user_id = ?
                 GROUP BY t.id
                 ORDER BY t.id DESC
         ");
+
+        $stmt->execute([$user_id]);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $tasks = [];
         foreach ($rows as $row) {
@@ -45,9 +51,9 @@ class TaskRepository implements TaskRepositoryInterface
         return $tasks;
     }
 
-    public function getTasksWithCommentCount(): array
+    public function getTasksWithCommentCount(int $user_id): array
     {
-        $stmt = $this->db->query("
+        $stmt = $this->db->prepare("
                 SELECT 
                     t.id,
                     t.title,
@@ -58,10 +64,11 @@ class TaskRepository implements TaskRepositoryInterface
                 FROM tasks t
                 LEFT JOIN comments c ON c.task_id = t.id
                 WHERE t.is_deleted = 0
+                AND t.user_id = ?
                 GROUP BY t.id
                 ORDER BY t.id DESC
             ");
-
+         $stmt->execute([$user_id]);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         $tasks = [];
@@ -72,7 +79,7 @@ class TaskRepository implements TaskRepositoryInterface
         return $tasks;
     }
 
-    public function getFilteredTasks(array $filters): array
+    public function getFilteredTasks(array $filters,int $user_id): array
     {
         $sql = "
         SELECT 
@@ -85,13 +92,14 @@ class TaskRepository implements TaskRepositoryInterface
         FROM tasks t
         LEFT JOIN comments c ON c.task_id = t.id
         WHERE t.is_deleted = 0
+         AND t.user_id = ?
     ";
 
-        $params = [];
+        $params = [$user_id];
 
         if (!empty($filters['status'])) {
             $sql .= " AND t.status = ?";
-            $params[] = $filters['status'];
+            $params[] = $filters['status']; 
         }
 
         if (!empty($filters['search'])) {
@@ -126,14 +134,14 @@ class TaskRepository implements TaskRepositoryInterface
 
 
     //---------------this is for view specific task page 
-    public function findById(int $id): ?Task
+    public function findById(int $id, int $user_id): ?Task
     {
         $stmt = $this->db->prepare("
             SELECT * FROM tasks
-            WHERE id = ? 
+            WHERE id = ? AND user_id = ?
         ");
 
-        $stmt->execute([$id]);
+        $stmt->execute([$id, $user_id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return $row ? new Task($row) : null;
     }
@@ -147,11 +155,12 @@ class TaskRepository implements TaskRepositoryInterface
     public function create(array $data): int
     {
         $stmt = $this->db->prepare("
-            INSERT INTO tasks (title, description, status, priority)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO tasks (user_id, title, description, status, priority)
+            VALUES (?, ?, ?, ?, ?)
         ");
 
         $stmt->execute([
+            $data['user_id'],
             $data['title'],
             $data['description'],
             $data['status'],
@@ -186,15 +195,16 @@ class TaskRepository implements TaskRepositoryInterface
 
 
     //-------------------soft delete task  
-    public function softDelete(int $id): bool
+    public function softDelete(int $id , int $user_id): bool
     {
         $stmt = $this->db->prepare("
             UPDATE tasks
             SET is_deleted = 1 
-            WHERE id = ?
+            WHERE id = ? AND user_id = ?
+
         ");
 
-        return $stmt->execute([$id]);
+        return $stmt->execute([$id ,$user_id]);
     }
 
 
