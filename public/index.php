@@ -153,5 +153,5 @@ switch ($uri) {
 
 
     default:
-        echo "404 - Page Not Found";
+        echo " opps! 404 - Page Not Found";
 }

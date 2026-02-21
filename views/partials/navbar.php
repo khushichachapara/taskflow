@@ -46,6 +46,7 @@
     .user-circle {
         width: 40px;
         height: 40px;
+        border: solid #fe5145 1px;
         border-radius: 50%;
         background: #459efe;
         color: white;
@@ -102,7 +103,7 @@ $initial = strtoupper(substr($userName, 0, 1));
                     <div class="user-name"><?= $userName ?></div>
                 </div>
             <?php else: ?>
-                <span style="color: black;">
+                <span style="color: #fe5145;">
 
                     <?php if ($isHome): ?>
                         Welcome, <?= $userName ?>

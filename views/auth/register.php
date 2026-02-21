@@ -104,15 +104,20 @@
                         <?php foreach ($_SESSION['errors'] as $error): ?>
                             <li><?= htmlspecialchars($error) ?></li>
                         <?php endforeach; ?>
-                        </ul>
+                    </ul>
                 </div>
                 <?php unset($_SESSION['errors']); ?>
             <?php endif; ?>
 
             <form method="POST" action="/taskflow/register">
-                <input type="text" name="name" placeholder="Full Name" required>
-                <input type="email" name="email" placeholder="Email Address" required>
-                <input type="password" name="password" placeholder="Password" required>
+                <input type="text" id="name" name="name" placeholder="Full Name">
+                <small id="nameError" style="color:red; display:none; font-size: medium; margin-bottom: 8px;"></small>
+
+                <input type="email" id="email" name="email" placeholder="Email Address">
+                <small id="emailError" style="color:red; display:none; font-size: medium; margin-bottom: 8px;"></small>
+
+                <input type="password" id="password" name="password" placeholder="Password">
+                <small id="passwordError" style="color:red; display:none; font-size: medium; margin-bottom: 8px;"></small>
 
                 <button type="submit">Sign Up</button>
             </form>
@@ -122,6 +127,79 @@
             </p>
         </div>
     </div>
+    <script>
+        const passwordInput = document.getElementById("password");
+        const passwordError = document.getElementById("passwordError");
+
+        const nameInput = document.getElementById('name');
+        const nameError = document.getElementById('nameError');
+
+        const emailInput = document.getElementById("email");
+        const emailError = document.getElementById("emailError");
+
+
+        passwordInput.addEventListener("input", function() {
+            let password = passwordInput.value.trim();
+
+            if (password === "") {
+                passwordError.style.display = "none";
+                return;
+            }
+
+
+            if (password.length < 6) {
+                passwordError.style.display = "block";
+                passwordError.style.color = "red";
+                passwordError.innerText = "Password must be at least 6 characters";
+            } else {
+                passwordError.style.display = "block";
+                passwordError.style.color = "green";
+                passwordError.innerText = "Password looks good ✅";
+            }
+        });
+
+        nameInput.addEventListener('input', function() {
+            let name = nameInput.value.trim();
+
+            if (name === "") {
+                nameError.style.display = "none";
+                return;
+            }
+
+            if (name.length < 4) {
+                nameError.style.display = 'block';
+                nameError.style.color = 'red';
+                nameError.innerText = 'Name Should be of atleast 4 letters'
+            } else {
+                nameError.style.display = 'block';
+                nameError.style.color = 'green';
+                nameError.innerText = 'Name looks Good✅'
+            }
+
+        });
+
+        emailInput.addEventListener("input", function() {
+            let email = emailInput.value.trim();
+
+            if (email === "") {
+                emailError.style.display = "none";
+                return;
+            }
+
+            // Simple email regex
+            let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!emailPattern.test(email)) {
+                emailError.style.display = "block";
+                emailError.style.color = "red";
+                emailError.innerText = "Enter a valid email address";
+            } else {
+                emailError.style.display = "block";
+                emailError.style.color = "green";
+                emailError.innerText = "Email looks good ✅";
+            }
+        });
+    </script>
     <?php require __DIR__ . '/../partials/footer.php'; ?>
 </body>
 

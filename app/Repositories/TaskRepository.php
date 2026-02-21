@@ -51,55 +51,57 @@ class TaskRepository implements TaskRepositoryInterface
         return $tasks;
     }
 
-    public function getTasksWithCommentCount(int $user_id): array
+    //--------------------To calculate total pages for pagination based on filters and search
+    public function countfilteredTasks(array $filters, int $user_id): int
     {
-        $stmt = $this->db->prepare("
-                SELECT 
-                    t.id,
-                    t.title,
-                    t.status,
-                    t.priority,
-                    t.created_at,
-                    COUNT(c.id) AS comment_count
-                FROM tasks t
-                LEFT JOIN comments c ON c.task_id = t.id
-                WHERE t.is_deleted = 0
-                AND t.user_id = ?
-                GROUP BY t.id
-                ORDER BY t.id DESC
-            ");
-         $stmt->execute([$user_id]);
-        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $sql = "SELECT COUNT(*) as total FROM tasks WHERE is_deleted = 0 AND user_id = ?";
+        $params = [$user_id];
 
-        $tasks = [];
-        foreach ($rows as $row) {
-            $tasks[] = new Task($row);
+        if (!empty($filters['status'])) {
+            $sql .= " AND status = ?";
+            $params[] = $filters['status'];
         }
 
-        return $tasks;
+        if (!empty($filters['search'])) {
+            $sql .= " AND title LIKE ?";
+            $params[] = "%" . $filters['search'] . "%";
+        }
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+
+        return (int) $stmt->fetchColumn();
     }
 
-    public function getFilteredTasks(array $filters,int $user_id): array
+
+    //---------------------------------To fetch current page data based on filters, search, sort and pagination
+    public function getFilteredPaginatedTasks(array $filters, int $user_id, int $limit, int $offset): array
     {
+
+        $allowedSortColumns = ['created_at', 'priority'];
+        $sortColumn = in_array($filters['sort'] ?? '', $allowedSortColumns)
+            ? $filters['sort']
+            : 'id';
+
         $sql = "
-        SELECT 
-            t.id,
-            t.title,
-            t.status,
-            t.priority,
-            t.created_at,
-            COUNT(c.id) AS comment_count
-        FROM tasks t
-        LEFT JOIN comments c ON c.task_id = t.id
-        WHERE t.is_deleted = 0
-         AND t.user_id = ?
-    ";
+            SELECT 
+                t.id,
+                t.title,
+                t.status,
+                t.priority,
+                t.created_at,
+                COUNT(c.id) AS comment_count
+            FROM tasks t
+            LEFT JOIN comments c ON c.task_id = t.id
+            WHERE t.is_deleted = 0
+            AND t.user_id = ?
+        ";
 
         $params = [$user_id];
 
         if (!empty($filters['status'])) {
             $sql .= " AND t.status = ?";
-            $params[] = $filters['status']; 
+            $params[] = $filters['status'];
         }
 
         if (!empty($filters['search'])) {
@@ -108,15 +110,21 @@ class TaskRepository implements TaskRepositoryInterface
         }
 
         $sql .= " GROUP BY t.id";
+        $sql .= " ORDER BY t.$sortColumn DESC";
+        $sql .= " LIMIT ? OFFSET ?";
 
-        if (!empty($filters['sort'])) {
-            $sql .= " ORDER BY t." . $filters['sort'] . " DESC";
-        } else {
-            $sql .= " ORDER BY t.id DESC";
-        }
+        $params[] = $limit;
+        $params[] = $offset;
 
         $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
+
+        foreach ($params as $index => $value) {
+            $type = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
+            $stmt->bindValue($index + 1, $value, $type);
+        }
+
+        $stmt->execute();
+
 
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -127,6 +135,7 @@ class TaskRepository implements TaskRepositoryInterface
 
         return $tasks;
     }
+
 
 
 
@@ -174,12 +183,12 @@ class TaskRepository implements TaskRepositoryInterface
 
 
     //-------------------update or edit quary for task 
-    public function update(int $id, array $data): bool
+    public function update(int $id, int $user_id, array $data): bool
     {
         $stmt = $this->db->prepare("
             UPDATE tasks
             SET title = ?, description = ?, status = ?, priority = ?
-            WHERE id = ?
+            WHERE id = ? AND user_id = ?
         ");
 
         return $stmt->execute([
@@ -187,7 +196,8 @@ class TaskRepository implements TaskRepositoryInterface
             $data['description'],
             $data['status'],
             $data['priority'],
-            $id
+            $id,
+            $user_id,
         ]);
     }
 
@@ -195,7 +205,7 @@ class TaskRepository implements TaskRepositoryInterface
 
 
     //-------------------soft delete task  
-    public function softDelete(int $id , int $user_id): bool
+    public function softDelete(int $id, int $user_id): bool
     {
         $stmt = $this->db->prepare("
             UPDATE tasks
@@ -204,7 +214,7 @@ class TaskRepository implements TaskRepositoryInterface
 
         ");
 
-        return $stmt->execute([$id ,$user_id]);
+        return $stmt->execute([$id, $user_id]);
     }
 
 
@@ -219,4 +229,8 @@ class TaskRepository implements TaskRepositoryInterface
 
     //     return $stmt->execute([$id]);
     // }
+
+
+
+
 }

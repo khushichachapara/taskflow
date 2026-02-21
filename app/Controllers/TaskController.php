@@ -16,7 +16,7 @@ class TaskController
 
 
 
-    //------------activity log helper function so code not get repeted every time
+    //--------------------activity log helper function so code not get repeted every time
     private function logActivity($taskId, $type, $message)
     {
         $activityRepo = new ActivityRepository();
@@ -36,34 +36,45 @@ class TaskController
 
 
 
-    //-------------this is for list task page
+    //-------------------this is for list task page
     public function index()
     {
         $basePath = '/taskflow';
         $user_id = $this->getUserId();
+
+        $perPage = 5; 
+        $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $currentPage = max($currentPage, 1);
+
+        $offset = ($currentPage - 1) * $perPage;
+
         $filters = [
             'status' => $_GET['status'] ?? null,
             'search' => $_GET['search'] ?? null,
-            'sort'   => $_GET['sort'] ?? null
+            'sort'   => $_GET['sort'] ?? null   
         ];
 
-        if (!empty($filters['status']) || !empty($filters['search']) || !empty($filters['sort'])) {
-            $tasks = $this->taskRepository->getFilteredTasks($filters, $user_id);
-        } else {
-            $tasks = $this->taskRepository->getTasksWithCommentCount($user_id);
-        }
-
+    
+        $totalTasks = $this->taskRepository->countfilteredTasks($filters, $user_id);
+        
+        $totalPages = ceil($totalTasks / $perPage);
+        
+        // Get paginated tasks
+        $tasks = $this->taskRepository
+        ->getFilteredPaginatedTasks($filters, $user_id, $perPage, $offset);
+        
+        
         //echo json_encode($tasks);
         require __DIR__ . '/../../views/tasks/list.php';
     }
 
-    
+
     //----------------json api endpoint task list page
     public function apiList()
     {
         header('Content-Type: application/json');
 
-        //====this getAll() method is only for api endpoint json data showing====
+        // THIS getall() method is only for api endpoint use and not for task list page with filter and pagination
         $tasks = $this->taskRepository->getAll($this->getUserId());
 
         echo json_encode($tasks);
@@ -144,7 +155,7 @@ class TaskController
 
         ];
 
-        $this->taskRepository->update($id, $data);
+        $this->taskRepository->update($id, $user_id, $data);
         if (
             $oldTask->title !== $data['title'] ||
             $oldTask->description !== $data['description'] ||
@@ -201,11 +212,7 @@ class TaskController
             return;
         }
         $basePath = '/taskflow';
-        $task = $this->taskRepository->findById($id, $user_id);
-        if (!$task) {
-            echo 'task not found';
-            return;
-        }
+
 
         $commentRepo = new CommentRepository();
         $activityRepo = new ActivityRepository();

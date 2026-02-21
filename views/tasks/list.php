@@ -9,6 +9,8 @@
             font-family: Arial, sans-serif;
             background: #f5f7fa;
             margin: 0;
+            /* background: linear-gradient(135deg, #459efe, #2563eb); */
+
         }
 
         .container {
@@ -18,6 +20,7 @@
             padding: 20px;
             border-radius: 6px;
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+
         }
 
         .header-row {
@@ -150,66 +153,6 @@
         .filters a.btnall {
             margin-left: 5px;
         }
-
-
-        /* ================= Premium Pagination ================= */
-
-        .pagination {
-            margin-top: 40px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 22px;
-            font-size: 14px;
-            font-weight: 500;
-            color: #6b7280;
-
-        }
-
-        .pagination a {
-            position: relative;
-            text-decoration: none;
-            color: #1c1d1f;
-            padding: 4px 2px;
-            transition: color 0.25s ease;
-        }
-
-        .pagination a::after {
-            content: "";
-            position: absolute;
-            left: 0;
-            bottom: -5px;
-            width: 0%;
-            height: 2px;
-            background: #459efe;
-            transition: width 0.25s ease;
-        }
-
-        .pagination a:hover {
-            color: #111827;
-        }
-
-        .pagination a:hover::after {
-            width: 100%;
-        }
-
-        .pagination a.active {
-            color: #111827;
-            font-weight: 600;
-        }
-
-        .pagination a.active::after {
-            width: 100%;
-        }
-
-        .pagination .nav-btn {
-            font-size: 13px;
-            color: darkgray;
-        }
-
-        .pagination .nav-btn:hover {
-            color: #111827;
-        }
     </style>
 </head>
 
@@ -299,21 +242,9 @@
 
             </tbody>
         </table>
-        <?php /*
         
-        */ ?>
-        <div class="pagination">
-            <a href="#" class="nav-btn" style="font-size:medium ; "> « Previous</a>
-
-            <a href="#" class="active">1</a>
-            <a href="#">2</a>
-            <a href="#">3</a>
-            <a href="#">4</a>
-
-            <a href="#" class="nav-btn" style="font-size: medium;">Next » </a>
-        </div>
-
-
+        <!-- Pagination Partial -->
+        <?php require __DIR__ . '/../partials/pagination.php'; ?>
 
 
     </div>

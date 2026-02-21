@@ -37,22 +37,25 @@ class AuthController
 
             $errors = [];
 
-
-
-            // Email validation
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $errors[] = "Invalid email format";
             }
 
-            // Password validation
             if (strlen($password) < 6) {
                 $errors[] = "Password must be at least 6 characters";
             }
+            
+            if (strlen($name) < 4) {
+                $errors[] = "Name must be at least 4 characters";
+            }
 
-            // Check  email already exists
+            //Check  email already exists
             if ($this->userRepository->findByEmail($email)) {
                 $errors[] = "Email already registered";
             }
+
+
+            //username already exists
 
             if (!empty($errors)) {
                 $_SESSION['errors'] = $errors;

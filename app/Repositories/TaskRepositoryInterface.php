@@ -11,7 +11,7 @@ interface TaskRepositoryInterface
 
     public function create(array $data): int;
 
-    public function update(int $id, array $data): bool;
+    public function update(int $id,int $user_id, array $data  ): bool;
 
     public function softDelete(int $id , int $user_id): bool;
 
