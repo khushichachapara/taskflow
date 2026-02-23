@@ -42,7 +42,7 @@ class TaskController
         $basePath = '/taskflow';
         $user_id = $this->getUserId();
 
-        $perPage = 5; 
+        $perPage = 5;
         $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
         $currentPage = max($currentPage, 1);
 
@@ -51,19 +51,19 @@ class TaskController
         $filters = [
             'status' => $_GET['status'] ?? null,
             'search' => $_GET['search'] ?? null,
-            'sort'   => $_GET['sort'] ?? null   
+            'sort'   => $_GET['sort'] ?? null
         ];
 
-    
+
         $totalTasks = $this->taskRepository->countfilteredTasks($filters, $user_id);
-        
+
         $totalPages = ceil($totalTasks / $perPage);
-        
+
         // Get paginated tasks
         $tasks = $this->taskRepository
-        ->getFilteredPaginatedTasks($filters, $user_id, $perPage, $offset);
-        
-        
+            ->getFilteredPaginatedTasks($filters, $user_id, $perPage, $offset);
+
+
         //echo json_encode($tasks);
         require __DIR__ . '/../../views/tasks/list.php';
     }
@@ -111,10 +111,19 @@ class TaskController
             header("Location: /taskflow/tasks/create");
             exit;
         }
-        if (!preg_match("/^[a-zA-Z0-9 _-]+$/", $title)) {
+        if (!preg_match("/^[a-zA-Z0-9 ]{5,}$/", $title)) {
             $_SESSION['error'] = 'Invalid input type.';
             header("Location: /taskflow/tasks/create");
             exit;
+        }
+
+        $description = trim($data['description']);
+       
+        if ($data['description'] !== '') {
+
+            if (!preg_match('/^(?=.*[a-zA-Z])[a-zA-Z0-9 .!_,\-]{10,}$/',$description)) {
+                $errors[] = "Please add a more meaningful description (minimum 10 characters).";
+            }
         }
 
         $taskId = $this->taskRepository->create($data);

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Task | Edit</title>
 
@@ -16,7 +17,7 @@
             background: #fff;
             padding: 20px;
             border-radius: 6px;
-            box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
         }
 
         h2 {
@@ -29,7 +30,8 @@
             font-size: medium;
         }
 
-        input, textarea{
+        input,
+        textarea {
             width: 95%;
             padding: 8px;
             margin-top: 6px;
@@ -67,38 +69,43 @@
 </head>
 
 <body>
-<?php require __DIR__ ."/../partials/navbar.php"; ?>
+    <?php require __DIR__ . "/../partials/navbar.php"; ?>
 
-<div class="container">
-    <h2>Edit Task</h2>
+    <div class="container">
+        <h2>Edit Task</h2>
 
-    <form method="POST" action="<?= $basePath ?>/tasks/update">
+        <form method="POST" action="<?= $basePath ?>/tasks/update" onsubmit="return confirmEdit()">
 
-        <input type="hidden" name="id" value="<?= htmlspecialchars($task->id) ?>">
+            <input type="hidden" name="id" value="<?= htmlspecialchars($task->id) ?>">
 
-        <label>Title <span style="color: #ce0d0d;">*</span></label>
-        <input type="text" name="title" value="<?= htmlspecialchars($task->title) ?> " required>
+            <label>Title <span style="color: #ce0d0d;">*</span></label>
+            <input type="text" name="title" value="<?= htmlspecialchars($task->title) ?> " required>
 
-        <label>Description</label>
-        <textarea name="description"><?= htmlspecialchars($task->description) ?></textarea>
+            <label>Description</label>
+            <textarea name="description"><?= htmlspecialchars($task->description) ?></textarea>
 
-        <label>Status</label>
-        <select name="status">
-            <option value="pending" <?= $task->status=='pending'?'selected':'' ?>>Pending</option>
-            <option value="in_progress" <?= $task->status=='in_progress'?'selected':'' ?>>In Progress</option>
-            <option value="completed" <?= $task->status=='completed'?'selected':'' ?>>Completed</option>
-        </select>
+            <label>Status</label>
+            <select name="status">
+                <option value="pending" <?= $task->status == 'pending' ? 'selected' : '' ?>>Pending</option>
+                <option value="in_progress" <?= $task->status == 'in_progress' ? 'selected' : '' ?>>In Progress</option>
+                <option value="completed" <?= $task->status == 'completed' ? 'selected' : '' ?>>Completed</option>
+            </select>
 
-        <label>Priority</label>
-        <select name="priority">
-            <option value="low" <?= $task->priority=='low'?'selected':'' ?>>Low</option>
-            <option value="medium" <?= $task->priority=='medium'?'selected':'' ?>>Medium</option>
-            <option value="high" <?= $task->priority=='high'?'selected':'' ?>>High</option>
-        </select>
+            <label>Priority</label>
+            <select name="priority">
+                <option value="low" <?= $task->priority == 'low' ? 'selected' : '' ?>>Low</option>
+                <option value="medium" <?= $task->priority == 'medium' ? 'selected' : '' ?>>Medium</option>
+                <option value="high" <?= $task->priority == 'high' ? 'selected' : '' ?>>High</option>
+            </select>
 
-        <button type="submit">Update Task</button>
-    </form>
-</div>
-
+            <button type="submit">Update Task</button>
+        </form>
+    </div>
+    <script>
+        function confirmEdit() {
+            return confirm("Are you sure you want to update this task?");
+        }
+    </script>
 </body>
+
 </html>

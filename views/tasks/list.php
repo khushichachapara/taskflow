@@ -191,7 +191,10 @@
 
 
                 <a href="<?= $basePath ?>/tasks"
-                    class="btnall">Clear Filter
+                    class="btnall"
+                    id="clearbtn"
+                    onclick="return confirm('Are you sure you want to clear filters?');">
+                    Clear Filter
                 </a>
             </div>
         </form>
@@ -242,7 +245,7 @@
 
             </tbody>
         </table>
-        
+
         <!-- Pagination Partial -->
         <?php require __DIR__ . '/../partials/pagination.php'; ?>
 

@@ -143,6 +143,7 @@
 
             if (password === "") {
                 passwordError.style.display = "none";
+                passwordInput.style.border = 'solid 1px #ccc';
                 return;
             }
 
@@ -151,10 +152,12 @@
                 passwordError.style.display = "block";
                 passwordError.style.color = "red";
                 passwordError.innerText = "Password must be at least 6 characters";
+                passwordError.style.border = "1px solid red"
             } else {
                 passwordError.style.display = "block";
                 passwordError.style.color = "green";
-                passwordError.innerText = "Password looks good ✅";
+                passwordError.innerText = " ✅ Password looks good ";
+                passwordInput.style.border = '1px solid #ccc';
             }
         });
 
@@ -163,6 +166,7 @@
 
             if (name === "") {
                 nameError.style.display = "none";
+                nameInput.style.border = '1px solid #ccc';
                 return;
             }
 
@@ -173,7 +177,8 @@
             } else {
                 nameError.style.display = 'block';
                 nameError.style.color = 'green';
-                nameError.innerText = 'Name looks Good✅'
+                nameError.innerText = '✅ Name looks Good'
+                nameInput.style.border = '1px solid #ccc';
             }
 
         });
@@ -183,6 +188,7 @@
 
             if (email === "") {
                 emailError.style.display = "none";
+                emailInput.style.border = '1px solid #ccc';
                 return;
             }
 
@@ -196,7 +202,8 @@
             } else {
                 emailError.style.display = "block";
                 emailError.style.color = "green";
-                emailError.innerText = "Email looks good ✅";
+                emailError.innerText = " ✅ Email looks good ";
+                emailInput.style.border = '1px solid #ccc';
             }
         });
     </script>
