@@ -7,7 +7,6 @@ ini_set('error_log', __DIR__ . '/../storage/logs/app.log');
 session_start();
 require __DIR__ . '/../vendor/autoload.php';
 
-
 use TaskFlow\Controllers\HomeController;
 use TaskFlow\Controllers\AuthController;
 use TaskFlow\Controllers\TaskController;
@@ -19,6 +18,14 @@ $dotenv->load();
 // $db = TaskFlow\Core\Database::connect();
 // echo "DB connected successfully";
 // die;
+
+// $redis = new \Redis();
+
+// if ($redis->connect('127.0.0.1', 6379)) {
+//     echo "Connected successfully";
+// } else {
+//     echo "Connection failed";
+// }
 $pdo = \TaskFlow\Core\Database::connect();
 
 

@@ -228,7 +228,7 @@ class TaskController
 
 
         //fetching cooment and activity log
-        $comments = $commentRepo->getCommentByTaskId($id);
+        $comments = $commentRepo->getCommentByTaskId($id , $user_id);
         $logs = $activityRepo->getLogByTaskId($id);
 
 

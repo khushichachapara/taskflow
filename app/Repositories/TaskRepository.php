@@ -1,28 +1,57 @@
 <?php
 
-// ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL);
 namespace TaskFlow\Repositories;
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 
 use TaskFlow\Core\Database;
 use TaskFlow\Models\Task;
+use TaskFlow\Core\RedisService;
 use PDO;
 
 class TaskRepository implements TaskRepositoryInterface
 {
 
     private PDO $db;
+    private RedisService $redis;
 
     public function __construct()
     {
         $this->db = Database::getInstance();
+        $this->redis = new RedisService();
+    }
+
+
+    //-------------------clear cache 
+    private function clearUserTaskCache(int $user_id): void
+    {
+        $this->redis->deleteByPattern("tasks:user:$user_id:*");
+    }
+
+    private function clearSingleTaskCache(int $id, int $user_id): void
+    {
+        $this->redis->delete("task:id:$id:user:$user_id");
     }
 
 
     //-----------------this for fetch all column simple and second one with aggregate column count with json return api endpoint 
     public function getAll(int $user_id): array
     {
+
+        $cacheKey = "tasks:user:$user_id:all";
+
+        $cached = $this->redis->get($cacheKey);
+
+        if ($cached !== null) {
+            $rows = json_decode($cached, true);
+           if (is_array($rows)) {
+        return array_map(fn($row) => new Task($row), $rows);
+    }
+        }
+
         $stmt = $this->db->prepare("
             SELECT 
                     t.id,
@@ -44,6 +73,8 @@ class TaskRepository implements TaskRepositoryInterface
 
         $stmt->execute([$user_id]);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $this->redis->set($cacheKey, json_encode($rows), 600);
         $tasks = [];
         foreach ($rows as $row) {
             $tasks[] = new Task($row);
@@ -78,6 +109,20 @@ class TaskRepository implements TaskRepositoryInterface
     public function getFilteredPaginatedTasks(array $filters, int $user_id, int $limit, int $offset): array
     {
 
+        //if exists in redis
+        $cacheKey = "tasks:user:$user_id:" . md5(json_encode($filters) . ":$limit:$offset");
+
+        $cached = $this->redis->get($cacheKey);
+
+        if ($cached !== null) {
+            $rows = json_decode($cached, true);
+           if (is_array($rows)) {
+        return array_map(fn($row) => new Task($row), $rows);
+    }
+        }
+
+
+        //if not in redis
         $allowedSortColumns = ['created_at', 'priority'];
         $sortColumn = in_array($filters['sort'] ?? '', $allowedSortColumns)
             ? $filters['sort']
@@ -128,6 +173,8 @@ class TaskRepository implements TaskRepositoryInterface
 
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+        $this->redis->set($cacheKey, json_encode($rows), 600);
+
         $tasks = [];
         foreach ($rows as $row) {
             $tasks[] = new Task($row);
@@ -145,6 +192,15 @@ class TaskRepository implements TaskRepositoryInterface
     //---------------this is for view specific task page 
     public function findById(int $id, int $user_id): ?Task
     {
+
+        $cacheKey = "task:id:$id:user:$user_id";
+
+        $cached = $this->redis->get($cacheKey);
+
+        if ($cached) {
+            return new Task(json_decode($cached, true));
+        }
+
         $stmt = $this->db->prepare("
             SELECT * FROM tasks
             WHERE id = ? AND user_id = ?
@@ -152,7 +208,13 @@ class TaskRepository implements TaskRepositoryInterface
 
         $stmt->execute([$id, $user_id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $row ? new Task($row) : null;
+
+
+        if (!$row) return null;
+
+        $this->redis->set($cacheKey, json_encode($row), 600);
+
+        return new Task($row);
     }
 
 
@@ -175,7 +237,9 @@ class TaskRepository implements TaskRepositoryInterface
             $data['status'],
             $data['priority']
         ]);
-        return (int)$this->db->lastInsertId();
+        $taskId = (int) $this->db->lastInsertId();
+        $this->clearUserTaskCache($data['user_id']);
+        return $taskId;
     }
 
 
@@ -191,7 +255,7 @@ class TaskRepository implements TaskRepositoryInterface
             WHERE id = ? AND user_id = ?
         ");
 
-        return $stmt->execute([
+        $result = $stmt->execute([
             $data['title'],
             $data['description'],
             $data['status'],
@@ -199,6 +263,10 @@ class TaskRepository implements TaskRepositoryInterface
             $id,
             $user_id,
         ]);
+        $this->clearSingleTaskCache($id, $user_id);
+        $this->clearUserTaskCache($user_id);
+
+        return $result;
     }
 
 
@@ -214,7 +282,10 @@ class TaskRepository implements TaskRepositoryInterface
 
         ");
 
-        return $stmt->execute([$id, $user_id]);
+        $result = $stmt->execute([$id, $user_id]);
+        $this->clearSingleTaskCache($id, $user_id);
+        $this->clearUserTaskCache($user_id);
+        return $result;
     }
 
 
