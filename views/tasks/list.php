@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-
+    
 <head>
     <title>TaskFlow | Tasks</title>
 
@@ -153,6 +153,43 @@
         .filters a.btnall {
             margin-left: 5px;
         }
+
+        /* css for alert box */
+
+        .my-confirm-btn {
+            background: #459efe;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-weight: bold;
+            border: none;
+            margin-right: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .my-confirm-btn:hover {
+            background: white;
+            color: #459efe;
+            border: 1px solid #459efe;
+            transform: scale(1.05);
+        }
+
+        .my-cancel-btn {
+            background: #d33;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 6px;
+            border: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .my-cancel-btn:hover {
+            background: white;
+            color: #d33;
+            border: 1px solid #d33;
+            transform: scale(1.05);
+        }
     </style>
 </head>
 
@@ -187,13 +224,11 @@
                 <button type="submit">Apply</button>
 
 
-                <!-- impliment all task view button after filtering -->
-
 
                 <a href="<?= $basePath ?>/tasks"
                     class="btnall"
                     id="clearbtn"
-                    onclick="return confirm('Are you sure you want to clear filters?');">
+                    onclick="return clearFilter(event);">
                     Clear Filter
                 </a>
             </div>
@@ -232,8 +267,11 @@
                                 <button type="submit">Edit</button>
                             </form>
 
-                            <form action="<?= $basePath ?>/tasks/delete" method="get" style="display:inline;"
-                                onsubmit="return confirm('Delete this task?');">
+                            <form action="<?= $basePath ?>/tasks/delete" method="POST" style="display:inline;"
+                                onsubmit="return DeleteTask(event);">
+                                <input type="hidden" name="_csrf_key" value="tasks_delete">
+                                <input type="hidden" name="_csrf_token"
+                                    value="<?= \TaskFlow\Core\Csrf::generate('tasks_delete'); ?>">
                                 <input type="hidden" name="id" value="<?= htmlspecialchars($task->id) ?>">
                                 <button type="submit" class="delete">Delete</button>
                             </form>
@@ -248,7 +286,54 @@
 
         <!-- Pagination Partial -->
         <?php require __DIR__ . '/../partials/pagination.php'; ?>
+        <script>
+            function clearFilter(event) {
+                event.preventDefault();
 
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "All Filters will be cleared .",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, Clear',
+                    cancelButtonText: 'Cancel',
+                    customClass: {
+                        confirmButton: 'my-confirm-btn',
+                        cancelButton: 'my-cancel-btn'
+                    },
+                    buttonsStyling: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = event.target.href;
+                    }
+                });
+            }
+        </script>
+
+        <script>
+            function DeleteTask(event) {
+                event.preventDefault();
+                const form = event.target;
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Task will be deleted!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, Delete',
+                    cancelButtonText: 'Cancel',
+                    customClass: {
+                        confirmButton: 'my-confirm-btn',
+                        cancelButton: 'my-cancel-btn'
+                    },
+                    buttonsStyling: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+                return false;
+            }
+        </script>
 
     </div>
 

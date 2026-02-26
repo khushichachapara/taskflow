@@ -27,6 +27,7 @@ class RedisService
             }
         } catch (\Throwable $e) {
             // Fallback mode — app will continue without Redis
+            error_log("Redis connection failed: " . $e->getMessage());
             $this->client = null;
         }
     }

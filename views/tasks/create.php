@@ -97,6 +97,8 @@
         <?php endif; ?>
 
         <form method="POST" action="<?= $basePath ?>/tasks/store" onsubmit="return validateTask()">
+            <input type="hidden" name="_csrf_key" value="tasks_store">
+            <input type="hidden" name="_csrf_token" value="<?= \TaskFlow\Core\Csrf::generate('tasks_store'); ?>">
 
             <label>Title <span style="color: #ce0d0d;">*</span></label>
             <input type="text" id='title' placeholder="Add Task Title here ..." name="title" value="<?= htmlspecialchars($_POST['title'] ?? '') ?>" required>
@@ -157,9 +159,9 @@
                 isValid = false;
             }
 
-            let patternDesc =/^(?=.*[a-zA-Z])[a-zA-Z0-9 .!_,\-]{10,}$/;
+            let patternDesc = /^(?=.*[a-zA-Z])[a-zA-Z0-9 .!_,\-]{10,}$/;
             let description = descriptionInput.value.trim();
-             
+
             if (description !== "") {
 
                 if (!patternDesc.test(description)) {

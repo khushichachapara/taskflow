@@ -6,10 +6,10 @@ class Csrf
 {
     public static function generate(string $formKey): string
     {
-
         if (!isset($_SESSION['_csrf_token']) || !is_array($_SESSION['_csrf_token'])) {
             $_SESSION['_csrf_token'] = [];
         }
+
         if (empty($_SESSION['_csrf_token'][$formKey])) {
             $_SESSION['_csrf_token'][$formKey] = bin2hex(random_bytes(32));
         }
@@ -17,7 +17,7 @@ class Csrf
         return $_SESSION['_csrf_token'][$formKey];
     }
 
-    public static function verify( string $formKey,?string $token): bool
+    public static function verify(string $formKey, ?string $token): bool
     {
         if (
             !isset($_SESSION['_csrf_token']) ||

@@ -65,6 +65,47 @@
             background: #fff;
             color: #459efe;
         }
+
+        /* css for alert box */
+
+        .my-confirm-btn {
+            background: #459efe;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-weight: bold;
+            border: none;
+            margin-right: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .my-confirm-btn:hover {
+            background: white;
+            color: #459efe;
+            border: 1px solid #459efe;
+            transform: scale(1.05);
+        }
+
+        .my-cancel-btn {
+            background: #d33;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 6px;
+            border: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .my-cancel-btn:hover {
+            background: white;
+            color: #d33;
+            border: 1px solid #d33;
+            transform: scale(1.05);
+        }
+
+        .swal2-popup button {
+            width: auto !important;
+        }
     </style>
 </head>
 
@@ -74,8 +115,9 @@
     <div class="container">
         <h2>Edit Task</h2>
 
-        <form method="POST" action="<?= $basePath ?>/tasks/update" onsubmit="return confirmEdit()">
-
+        <form method="POST" action="<?= $basePath ?>/tasks/update" onsubmit="return confirmEdit(event)">
+            <input type="hidden" name="_csrf_key" value="tasks_update">
+            <input type="hidden" name="_csrf_token" value="<?= \TaskFlow\Core\Csrf::generate("tasks_update"); ?>">
             <input type="hidden" name="id" value="<?= htmlspecialchars($task->id) ?>">
 
             <label>Title <span style="color: #ce0d0d;">*</span></label>
@@ -101,9 +143,31 @@
             <button type="submit">Update Task</button>
         </form>
     </div>
+
     <script>
-        function confirmEdit() {
-            return confirm("Are you sure you want to update this task?");
+        function confirmEdit(event) {
+            event.preventDefault();
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You want to update this task!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes,update it!',
+                cancelButtonText: 'Cancel',
+                customClass: {
+
+                    confirmButton: 'my-confirm-btn',
+                    cancelButton: 'my-cancel-btn'
+                },
+
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    event.target.submit();
+                }
+            });
+
+            return false;
         }
     </script>
 </body>
