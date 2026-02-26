@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>TaskFlow</title>
@@ -24,7 +25,7 @@
             background: #ffffff;
             padding: 48px 56px;
             border-radius: 12px;
-            box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
             text-align: center;
         }
 
@@ -54,26 +55,107 @@
             line-height: 1.6;
             color: #4b5563;
         }
-    </style>    
+
+
+        /* css for alert box */
+        .my-confirm-btn {
+            background: #459efe;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-weight: bold;
+            border: none;
+            margin-right: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .my-confirm-btn:hover {
+            background: white;
+            color: #459efe;
+            border: 1px solid #459efe;
+            transform: scale(1.05);
+        }
+
+        .my-cancel-btn {
+            background: #d33;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 6px;
+            border: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .my-cancel-btn:hover {
+            background: white;
+            color: #d33;
+            border: 1px solid #d33;
+            transform: scale(1.05);
+        }
+    </style>
 </head>
+
 <body>
 
-<?php require __DIR__ . '/partials/navbar.php'; ?>
+    <?php require __DIR__ . '/partials/navbar.php'; ?>
 
-<div class="hero">
-    <div class="hero-content">
-        <h1>TaskFlow</h1>
-        <div class="subtitle">Task Management System</div>
+    <div class="hero">
+        <div class="hero-content">
+            <h1>TaskFlow</h1>
+            <div class="subtitle">Task Management System</div>
 
-        <div class="divider"></div>
+            <div class="divider"></div>
 
-        <p class="description">
-            TaskFlow helps you organize tasks, track progress,
-            and maintain a clear workflow using a structured and
-            reliable system designed for everyday productivity.
-        </p>
+            <p class="description">
+                TaskFlow helps you organize tasks, track progress,
+                and maintain a clear workflow using a structured and
+                reliable system designed for everyday productivity.
+            </p>
+        </div>
     </div>
-</div>
-<?php require __DIR__ . '/partials/footer.php'; ?>
+    <?php require __DIR__ . '/partials/footer.php'; ?>
+
+    <?php if (!empty($_SESSION['login_success'])): ?>
+        <script>
+            window.onload = function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Login Successful!',
+                    text: 'Welcome back <?= $_SESSION['user_name'] ?? '' ?>!',
+                    confirmButtonText: 'Continue',
+                    customClass: {
+                        confirmButton: 'my-confirm-btn'
+                    },
+                    buttonsStyling: false
+                });
+            };
+        </script>
+        <?php unset($_SESSION['login_success']); ?>
+    <?php endif; ?>
+
+    <script>
+        function confirmLogout(event) {
+            event.preventDefault();
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You will be logged out!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, Logout',
+                cancelButtonText: 'Cancel',
+                customClass: {
+                    confirmButton: 'my-confirm-btn',
+                    cancelButton: 'my-cancel-btn'
+                },
+                buttonsStyling: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = event.target.href;
+                }
+            });
+        }
+    </script>
 </body>
+
 </html>

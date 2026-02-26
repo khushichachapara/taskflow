@@ -118,10 +118,10 @@ class TaskController
         }
 
         $description = trim($data['description']);
-       
+
         if ($data['description'] !== '') {
 
-            if (!preg_match('/^(?=.*[a-zA-Z])[a-zA-Z0-9 .!_,\-]{10,}$/',$description)) {
+            if (!preg_match('/^(?=.*[a-zA-Z])[a-zA-Z0-9 .!_,\-]{10,}$/', $description)) {
                 $errors[] = "Please add a more meaningful description (minimum 10 characters).";
             }
         }
@@ -147,6 +147,12 @@ class TaskController
             echo 'task not found';
             return;
         }
+
+        if ($task->is_deleted) {
+            header("Location: /taskflow/tasks/view?id=" . $id);
+            exit;
+        }
+
         $basePath = '/taskflow';
         require __DIR__ . "/../../views/tasks/edit.php";
     }
@@ -156,6 +162,16 @@ class TaskController
         $user_id = $this->getUserId();
 
         $oldTask = $this->taskRepository->findById($id, $user_id);
+
+        if (!$oldTask) {
+            header("Location: /taskflow/tasks");
+            exit;
+        }
+
+        if ($oldTask->is_deleted) {
+            header("Location: /taskflow/tasks/view?id=" . $id);
+            exit;
+        }
         $data = [
             'title' => $_POST['title'],
             'description' => $_POST['description'],
@@ -193,11 +209,17 @@ class TaskController
             echo 'Task not found';
             return;
         }
+        if ($task->is_deleted) {
+            header("Location: /taskflow/tasks/view?id=" . $id);
+            exit;
+        }
         $user_id = $this->getUserId();
         $this->taskRepository->softDelete($id, $user_id);
         $this->logActivity($id, 'task_deleted', 'Task Deleted');
 
-        if (isset($_GET['from']) && $_GET['from'] === 'view') {
+        $_SESSION['success'][] = 'Task deleted successfully.';
+        $redirect = $_POST['redirect_to'] ?? null;
+        if ($redirect === 'view') {
             header("Location: /taskflow/tasks/view?id=" . $id);
         } else {
             header("Location: /taskflow/tasks");
@@ -221,14 +243,14 @@ class TaskController
             return;
         }
         $basePath = '/taskflow';
-
+        $isDeleted = $task->is_deleted ?? false;
 
         $commentRepo = new CommentRepository();
         $activityRepo = new ActivityRepository();
 
 
         //fetching cooment and activity log
-        $comments = $commentRepo->getCommentByTaskId($id , $user_id);
+        $comments = $commentRepo->getCommentByTaskId($id, $user_id);
         $logs = $activityRepo->getLogByTaskId($id);
 
 

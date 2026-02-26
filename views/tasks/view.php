@@ -37,7 +37,7 @@
             margin-top: 10px;
         }
 
-        button {
+        .cmtbtn {
             padding: 7px 14px;
             background: #459efe;
             color: #fff;
@@ -49,7 +49,7 @@
             margin-bottom: 15px;
         }
 
-        button:hover {
+        .cmtbtn:hover {
             background: #fff;
             color: #459efe;
         }
@@ -67,7 +67,7 @@
         .comment-text {
             font-size: 14px;
             color: #111827;
-            
+
         }
 
         .log {
@@ -86,7 +86,7 @@
 
         .actions .btn {
             display: inline-block;
-            padding: 8px 14px;
+            padding: 7px 14px;
             background: #459efe;
             color: #fff;
             border-radius: 4px;
@@ -95,6 +95,8 @@
             margin-bottom: 15px;
             border: 1px solid #459efe;
         }
+
+
 
         .actions .btn:hover {
             background: #fff;
@@ -128,6 +130,43 @@
             background: #fff;
             color: #6b7280;
         }
+
+
+        /* alert box css */
+        .my-confirm-btn {
+            background: #459efe;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-weight: bold;
+            border: none;
+            margin-right: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .my-confirm-btn:hover {
+            background: white;
+            color: #459efe;
+            border: 1px solid #459efe;
+            transform: scale(1.05);
+        }
+
+        .my-cancel-btn {
+            background: #d33;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 6px;
+            border: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .my-cancel-btn:hover {
+            background: white;
+            color: #d33;
+            border: 1px solid #d33;
+            transform: scale(1.05);
+        }
     </style>
 </head>
 
@@ -143,6 +182,18 @@
 
         <!-- task info -->
         <h2><?= htmlspecialchars($task->title) ?></h2>
+        <?php if ($isDeleted): ?>
+            <div style="
+        background:#fee2e2;
+        color:#991b1b;
+        padding:10px;
+        border-radius:6px;
+        margin-bottom:15px;
+        font-weight:bold;
+    ">
+                ⚠ This task has been deleted. It is now read-only.
+            </div>
+        <?php endif; ?>
 
         <p><strong>Description:</strong> <?= htmlspecialchars($task->description) ?></p>
         <p><strong>Status:</strong> <?= htmlspecialchars($task->status) ?></p>
@@ -151,15 +202,41 @@
 
         <!-- button -->
         <div class="actions">
-            <a href="<?= $basePath ?>/tasks/edit?id=<?= htmlspecialchars($task->id) ?>" class="btn">
-                Edit
-            </a>
+            <?php if (!$isDeleted): ?>
+                <a href="<?= $basePath ?>/tasks/edit?id=<?= htmlspecialchars($task->id) ?>" class="btn">
+                    Edit
+                </a>
 
-            <a href="<?= $basePath ?>/tasks/delete?id=<?= htmlspecialchars($task->id) ?>&from=view"
-                class="btn delete"
-                onclick="return confirm('Delete this task?')">
-                Delete
-            </a>
+                <form method="POST"
+                    action="<?= $basePath ?>/tasks/delete"
+                    style="display:inline;"
+                    id="deleteForm">
+
+                    <input type="hidden" name="_csrf_key" value="tasks_delete">
+
+                    <input type="hidden"
+                        name="_csrf_token"
+                        value="<?= \TaskFlow\Core\Csrf::generate('tasks_delete'); ?>">
+
+                    <input type="hidden"
+                        name="id"
+                        value="<?= htmlspecialchars($task->id) ?>">
+
+                    <input type="hidden"
+                        name="redirect_to"
+                        value="view">
+
+                    <button type="button"
+                        class="btn delete"
+                        onclick="deleteConfirm()">
+                        Delete
+                    </button>
+                </form>
+            <?php else: ?>
+                <span style="color:gray; font-weight:bold;">
+                    Task Deleted
+                </span>
+            <?php endif; ?>
         </div>
 
         <hr />
@@ -179,13 +256,21 @@
                 <p style="color: #d11a2a;">No comments yet.</p>
             <?php endif; ?>
 
-            <div class="comment-box">
-                <form method="post" action="<?= $basePath ?>/comments/store">
-                    <input type="hidden" name="task_id" value="<?= $task->id ?>">
-                    <textarea name="comment" placeholder="Write a comment..." required></textarea>
-                    <button type="submit">Add Comment</button>
-                </form>
-            </div>
+            <?php if (!$isDeleted): ?>
+                <div class="comment-box">
+                    <form method="post" action="<?= $basePath ?>/comments/store">
+                        <input type="hidden" name="_csrf_key" value="comments_store">
+                        <input type="hidden" name="_csrf_token" value="<?= \TaskFlow\Core\Csrf::generate('comments_store'); ?>">
+                        <input type="hidden" name="task_id" value="<?= $task->id ?>">
+                        <textarea name="comment" placeholder="Write a comment..." required></textarea>
+                        <button class="cmtbtn" type="submit">Add Comment</button>
+                    </form>
+                </div>
+            <?php else: ?>
+                <p style="color:#991b1b; font-weight:bold;">
+                    Comments are disabled for deleted tasks.
+                </p>
+            <?php endif; ?>
         </div>
 
         <hr />
@@ -208,7 +293,29 @@
     </div>
 
     <?php require __DIR__ . '/../partials/footer.php'; ?>
+    <script>
+        function deleteConfirm() {
 
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "This task will be deleted.",
+                icon: 'warning',
+                showCancelButton: true,
+                cancelButtonText: 'Cancel',
+                confirmButtonText: 'Yes, delete it!',
+                customClass: {
+                    confirmButton: 'my-confirm-btn',
+                    cancelButton: 'my-cancel-btn'
+                },
+                buttonsStyling: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('deleteForm').submit();
+
+                }
+            });
+        }
+    </script>
 </body>
 
 </html>

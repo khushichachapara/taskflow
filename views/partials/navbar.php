@@ -62,12 +62,13 @@
 </style>
 
 
-
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <?php
 
 //button visibility logic
-$currentpath =rtrim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
+$currentpath = rtrim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
 
 
 $isLoginPage = ($currentpath === '/taskflow/login');
@@ -115,7 +116,7 @@ $initial = strtoupper(substr($userName, 0, 1));
 
                 <a href="tasks">Tasks</a>
                 <a href="tasks/create">Create Task</a>
-                <a href="logout">Logout</a>
+                <a href="logout" onclick="confirmLogout(event)">Logout</a>
             <?php endif; ?>
         <?php else: ?>
 
