@@ -229,6 +229,38 @@ class TaskController
 
 
 
+    //------------------------------delete task using ajax request and return json response
+
+    public function ajaxDelete()
+    {
+        header('Content-Type: application/json');
+
+        
+        $taskId = $_POST['id'] ?? null;
+        $userId = $this->getUserId();
+
+        if (!$taskId) {
+            echo json_encode(['success' => false, 'message' => 'Task ID missing']);
+            return;
+        }
+
+        $task = $this->taskRepository->findById($taskId, $userId);
+
+        if (!$task) {
+            echo json_encode(['success' => false, 'message' => 'Task not found']);
+            return;
+        }
+
+        $this->taskRepository->softDelete($taskId, $userId);
+
+        echo json_encode([
+            'success' => true,
+            'message' => 'Task deleted successfully',
+            'new_token' => \TaskFlow\Core\Csrf::generate('tasks_delete')
+        ]);
+    }
+
+
 
 
     //--------------this is for view specific task page 

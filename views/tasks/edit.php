@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html>
-
+<!-- <pre>
+    <?php
+    // print_r($_SESSION["_csrf_token"] ?? NULL);   
+    ?>
+</pre> -->
 <head>
     <title>Task | Edit</title>
 

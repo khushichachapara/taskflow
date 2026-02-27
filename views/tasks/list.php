@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html>
-    
+
+<!-- <pre>
+    <?php
+    // print_r($_SESSION["_csrf_token"] ?? NULL);
+    ?>
+</pre> -->
+
 <head>
     <title>TaskFlow | Tasks</title>
 
@@ -248,37 +254,50 @@
 
             <tbody>
 
-                <?php foreach ($tasks as $task): ?>
+                <?php if (count($tasks) > 0): ?>
+
+                    <?php foreach ($tasks as $task): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($task->title) ?></td>
+                            <td><?= htmlspecialchars($task->status) ?></td>
+                            <td><?= htmlspecialchars($task->priority) ?></td>
+                            <td><?= htmlspecialchars($task->created_at) ?></td>
+                            <td><?= htmlspecialchars($task->comment_count ?? 0) ?></td>
+
+                            <td class="actions">
+                                <form action="<?= $basePath ?>/tasks/view" method="get" style="display:inline;">
+                                    <input type="hidden" name="id" value="<?= htmlspecialchars($task->id) ?>">
+                                    <button type="submit">View</button>
+                                </form>
+
+                                <form action="<?= $basePath ?>/tasks/edit" method="get" style="display:inline;">
+                                    <input type="hidden" name="id" value="<?= htmlspecialchars($task->id) ?>">
+                                    <button type="submit">Edit</button>
+                                </form>
+
+                                <form action="<?= $basePath ?>/tasks/delete" method="POST" style="display:inline;">
+                                    <?php $csrfKey = 'tasks_delete_' . $task->id; ?>
+
+                                    <input type="hidden" name="_csrf_key" value="<?= $csrfKey ?>">
+                                    <input type="hidden" name="_csrf_token"
+                                        value="<?= \TaskFlow\Core\Csrf::generate($csrfKey); ?>">
+                                    <input type="hidden" name="id" value="<?= htmlspecialchars($task->id) ?>">
+                                    <button type="button" class="delete" onclick="return DeleteTask(event, this);">Delete</button>
+                                </form>
+                            </td>
+
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+
                     <tr>
-                        <td><?= htmlspecialchars($task->title) ?></td>
-                        <td><?= htmlspecialchars($task->status) ?></td>
-                        <td><?= htmlspecialchars($task->priority) ?></td>
-                        <td><?= htmlspecialchars($task->created_at) ?></td>
-                        <td><?= htmlspecialchars($task->comment_count ?? 0) ?></td>
-
-                        <td class="actions">
-                            <form action="<?= $basePath ?>/tasks/view" method="get" style="display:inline;">
-                                <input type="hidden" name="id" value="<?= htmlspecialchars($task->id) ?>">
-                                <button type="submit">View</button>
-                            </form>
-
-                            <form action="<?= $basePath ?>/tasks/edit" method="get" style="display:inline;">
-                                <input type="hidden" name="id" value="<?= htmlspecialchars($task->id) ?>">
-                                <button type="submit">Edit</button>
-                            </form>
-
-                            <form action="<?= $basePath ?>/tasks/delete" method="POST" style="display:inline;"
-                                onsubmit="return DeleteTask(event);">
-                                <input type="hidden" name="_csrf_key" value="tasks_delete">
-                                <input type="hidden" name="_csrf_token"
-                                    value="<?= \TaskFlow\Core\Csrf::generate('tasks_delete'); ?>">
-                                <input type="hidden" name="id" value="<?= htmlspecialchars($task->id) ?>">
-                                <button type="submit" class="delete">Delete</button>
-                            </form>
+                        <td colspan="6" style="text-align:center; padding:20px; color:red;">
+                            No tasks found
                         </td>
-
                     </tr>
-                <?php endforeach; ?>
+
+                <?php endif; ?>
+
 
 
             </tbody>
@@ -311,9 +330,19 @@
         </script>
 
         <script>
-            function DeleteTask(event) {
-                event.preventDefault();
-                const form = event.target;
+            function DeleteTask(event, btn) {
+
+                const form = btn.closest('form');
+
+                const taskId = form.querySelector('[name="id"]').value;
+                const csrfKey = form.querySelector('[name="_csrf_key"]').value;
+                const csrfToken = form.querySelector('[name="_csrf_token"]').value;
+
+                const formData = new FormData();
+                formData.append('id', taskId);
+                formData.append('_csrf_key', csrfKey);
+                formData.append('_csrf_token', csrfToken);
+
                 Swal.fire({
                     title: 'Are you sure?',
                     text: "Task will be deleted!",
@@ -325,16 +354,86 @@
                         confirmButton: 'my-confirm-btn',
                         cancelButton: 'my-cancel-btn'
                     },
-                    buttonsStyling: false
+
                 }).then((result) => {
+
                     if (result.isConfirmed) {
-                        form.submit();
+
+                        fetch('/taskflow/tasks/ajax-delete', {
+                                method: 'POST',
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                },
+                                body: formData
+                            })
+                            .then(res => res.json())
+                            .then(
+                                data => {
+
+                                    if (data.success) {
+
+                                        
+                                        // Swal.fire({
+                                        //     title: 'Deleted!',
+                                        //     text: data.message,
+                                        //     icon: 'success',
+                                        //     confirmButtonText: 'OK',
+                                        //     customClass: {
+                                        //         confirmButton: 'my-confirm-btn'
+                                        //     },
+                                        //     buttonsStyling: false
+                                        // });
+                                        // const row = form.closest('tr');
+                                        // row.remove();
+
+                                        // const remainingRows = document.querySelectorAll("tbody tr");
+
+                                        // if (remainingRows.length === 1) {
+                                        //     handleEmptyPage();
+                                        // }
+
+                                        const row = form.closest('tr');
+                                        row.remove();
+
+                                        setTimeout(() => {
+                                            window.location.reload();
+                                        }, 400);
+
+                                    } else {
+
+                                        Swal.fire({
+                                            title: 'Error',
+                                            text: data.message,
+                                            icon: 'error',
+                                            confirmButtonText: 'OK',
+                                            customClass: {
+                                                confirmButton: 'my-confirm-btn'
+                                            },
+                                            buttonsStyling: false
+                                        });
+
+                                    }
+
+                                });
                     }
                 });
+
                 return false;
             }
         </script>
+        <script>
+            function handleEmptyPage() {
 
+                const url = new URL(window.location.href);
+                let page = parseInt(url.searchParams.get('page')) || 1;
+
+                if (page > 1) {
+                    url.searchParams.set('page', page - 1);
+                }
+
+                window.location.href = url.toString();
+            }
+        </script>
     </div>
 
 

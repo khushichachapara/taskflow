@@ -46,6 +46,7 @@ $protectedRoutes = [
     '/tasks/view',
     '/tasks/store',
     '/tasks/delete',
+    '/tasks/ajax-delete',
     '/comments/store',
     '/api/tasks'
 ];
@@ -62,6 +63,7 @@ $csrfProtectedPostRoutes = [
     '/tasks/update',
     '/tasks/delete',
     '/comments/store',
+    '/tasks/ajax-delete',
     '/login',
     '/register'
 ];
@@ -165,6 +167,15 @@ switch ($uri) {
             exit;
         }
         break;
+
+
+    case '/tasks/ajax-delete':
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        (new TaskController())->ajaxDelete();
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Invalid request']);
+    }
+    break;
 
 
 
