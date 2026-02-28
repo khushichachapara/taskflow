@@ -421,7 +421,7 @@
                 return false;
             }
         </script>
-        <script>
+        <!-- <script>
             function handleEmptyPage() {
 
                 const url = new URL(window.location.href);
@@ -433,7 +433,7 @@
 
                 window.location.href = url.toString();
             }
-        </script>
+        </script> -->
     </div>
 
 

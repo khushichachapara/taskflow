@@ -20,7 +20,7 @@ $dotenv->load();
 // $db = TaskFlow\Core\Database::connect();
 // echo "DB connected successfully";
 // die;
-
+//echo session_save_path(); ----------- /var/lib/php/sessions 
 // $redis = new \Redis();
 
 // if ($redis->connect('127.0.0.1', 6379)) {

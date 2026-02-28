@@ -19,7 +19,7 @@
 
     .navbar .links a {
         background: #459efe;
-        color: #e0e7ff;
+        color: white;
         padding: 8px 16px;
         border-radius: 6px;
         font-size: large;
@@ -31,7 +31,7 @@
     }
 
     .navbar .links a:hover {
-        background: #e0e7ff;
+        background: white;
         color: #459efe;
     }
 
