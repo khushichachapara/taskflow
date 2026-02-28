@@ -1,10 +1,6 @@
 <!DOCTYPE html>
 <html>
-<pre>
-    <?php
-    print_r($_SESSION['_csrf_token']?? NULL);
-    ?>
-</pre>
+
 <head>
     <meta charset="UTF-8">
     <title>Task | Create </title>
@@ -78,6 +74,25 @@
             color: #459efe;
         }
 
+        .back-btn {
+            display: block;
+            text-align: center;
+            margin-top: 12px;
+            padding: 10px;
+            background: #459efe;
+            color: #fff;
+            border: 1px solid #459efe;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 16px;
+            transition: 0.2s;
+        }
+
+        .back-btn:hover {
+            background-color: #fff;
+            color: #459efe;
+        }
+
         .error {
             background: #fee2e2;
             color: #991b1b;
@@ -127,6 +142,8 @@
             </select>
 
             <button type="submit">Create Task</button>
+            <!-- back to list page -->
+            <a href="<?= $basePath ?>/tasks" class="back-btn">Back to Tasks</a>
         </form>
     </div>
     <script>

@@ -177,7 +177,7 @@
     <div class="container">
 
         <div style="margin-bottom:15px;">
-            <a href="<?= $basePath ?>/tasks" class="btn-back">← Back to Task List</a>
+            <a href="<?= $basePath ?>/tasks" class="btn-back">← Back to Tasks</a>
         </div>
 
         <!-- task info -->

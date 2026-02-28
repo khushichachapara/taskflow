@@ -39,15 +39,14 @@ class ActivityRepository
 
 
 
-
     //--------------------get log
     public function getLogByTaskId($taskId)
     {
-
+        
         $cacheKey = "activity_logs_" . $taskId;
 
         $logs = $this->cache->get($cacheKey);
-
+    
         if ($logs !== false) {
             return $logs;
         }
@@ -60,7 +59,8 @@ class ActivityRepository
     ");
         $stmt->execute([$taskId]);
         $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $this->cache->set($cacheKey, $logs, 300);
+
+        $this->cache->set($cacheKey, $logs, 600);
         return $logs;
     }
 }

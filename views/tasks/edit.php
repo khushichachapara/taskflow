@@ -5,6 +5,7 @@
     // print_r($_SESSION["_csrf_token"] ?? NULL);   
     ?>
 </pre> -->
+
 <head>
     <title>Task | Edit</title>
 
@@ -65,8 +66,28 @@
             border: #459efe solid 1px;
         }
 
+     
         button:hover {
             background: #fff;
+            color: #459efe;
+        }
+
+        .back-btn {
+            display: block;
+            text-align: center;
+            margin-top: 12px;
+            padding: 10px;
+            background: #459efe;
+            color: #fff;
+            border: 1px solid #459efe;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 16px;
+            transition: 0.2s;
+        }
+
+        .back-btn:hover {
+            background-color: #fff;
             color: #459efe;
         }
 
@@ -145,6 +166,7 @@
             </select>
 
             <button type="submit">Update Task</button>
+            <a href="<?= $basePath ?>/tasks" class="back-btn">Back to Tasks</a>
         </form>
     </div>
 
