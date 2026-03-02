@@ -79,9 +79,9 @@
             text-align: center;
             margin-top: 12px;
             padding: 10px;
-            background: #459efe;
+            background:  #6b7280;
             color: #fff;
-            border: 1px solid #459efe;
+            border: 1px solid  #6b7280;
             border-radius: 4px;
             text-decoration: none;
             font-size: 16px;
@@ -90,7 +90,7 @@
 
         .back-btn:hover {
             background-color: #fff;
-            color: #459efe;
+            color:  #6b7280;
         }
 
         .error {
